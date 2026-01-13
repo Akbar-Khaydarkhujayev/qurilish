@@ -12,7 +12,7 @@ export interface ApiResponse<T = any> {
   };
 }
 
-export const success Response<T>(
+export const success = <T>(
   res: Response,
   data: T,
   message: string = 'Success',

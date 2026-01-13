@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api', routes);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({
     message: 'Qurilish API Server',
     version: '1.0.0',

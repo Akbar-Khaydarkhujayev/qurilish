@@ -1,5 +1,3 @@
-import { QueryFilters } from '../types';
-
 export interface PaginationParams {
   page: number;
   limit: number;

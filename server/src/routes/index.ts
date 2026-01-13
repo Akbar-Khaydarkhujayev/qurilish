@@ -35,7 +35,7 @@ router.use('/', financialRoutes);
 router.use('/', fileRoutes);
 
 // Health check endpoint
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
 });
 

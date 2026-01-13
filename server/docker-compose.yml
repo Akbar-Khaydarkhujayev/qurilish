@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qurilish_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: qurilish_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./database/seeds:/docker-entrypoint-initdb.d/seeds
+
+volumes:
+  postgres_data:
