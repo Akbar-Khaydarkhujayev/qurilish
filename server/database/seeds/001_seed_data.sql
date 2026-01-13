@@ -84,10 +84,30 @@ INSERT INTO construction_items (name) VALUES
     ('Yong''indan himoya tizimlari'),
     ('Oynalarni o''rnatish');
 
--- Insert admin user (password: admin123)
--- Note: This should be changed in production
-INSERT INTO users (name, username, password, email, first_name, last_name, organization_id, role, user_type) VALUES
-    ('Admin User', 'admin', '$2b$10$rHZl6qG5qVJz2V6LYVj6ZOLQxJFxVYvxPqPxGKxUZGKZxYvxJFxVY', 'admin@qurilish.uz', 'Admin', 'User', 1, 'SuperAdmin', 'SuperAdmin');
+-- Insert users with different roles
+-- Password for all: admin123
+-- Note: Passwords should be changed in production
+
+-- Super Admin (can create region_admin)
+INSERT INTO users (name, username, password, email, first_name, last_name, organization_id, region_id, role, user_type) VALUES
+    ('Super Administrator', 'superadmin', '$2b$10$qE5QvKrDJE5amJlbqicNOefXCa7j1lCzNSxGWdAW9ryJ7lAoahiv.', 'superadmin@qurilish.uz', 'Super', 'Admin', 1, NULL, 'super_admin', 'Super Administrator');
+
+-- Region Admin for Toshkent shahri (can create users/technical supervisors)
+INSERT INTO users (name, username, password, email, first_name, last_name, organization_id, region_id, role, user_type) VALUES
+    ('Toshkent Region Admin', 'toshkent_admin', '$2b$10$qE5QvKrDJE5amJlbqicNOefXCa7j1lCzNSxGWdAW9ryJ7lAoahiv.', 'toshkent.admin@qurilish.uz', 'Toshkent', 'Admin', 1, 1, 'region_admin', 'Region Administrator');
+
+-- Region Admin for Toshkent viloyati
+INSERT INTO users (name, username, password, email, first_name, last_name, organization_id, region_id, role, user_type) VALUES
+    ('Toshkent Viloyat Admin', 'viloyat_admin', '$2b$10$qE5QvKrDJE5amJlbqicNOefXCa7j1lCzNSxGWdAW9ryJ7lAoahiv.', 'viloyat.admin@qurilish.uz', 'Viloyat', 'Admin', 2, 2, 'region_admin', 'Region Administrator');
+
+-- Technical Supervisors (users) in Toshkent shahri
+INSERT INTO users (name, username, password, email, first_name, last_name, organization_id, region_id, role, user_type) VALUES
+    ('Alisher Karimov', 'a.karimov', '$2b$10$qE5QvKrDJE5amJlbqicNOefXCa7j1lCzNSxGWdAW9ryJ7lAoahiv.', 'a.karimov@qurilish.uz', 'Alisher', 'Karimov', 1, 1, 'user', 'Technical Supervisor'),
+    ('Dilshod Rahimov', 'd.rahimov', '$2b$10$qE5QvKrDJE5amJlbqicNOefXCa7j1lCzNSxGWdAW9ryJ7lAoahiv.', 'd.rahimov@qurilish.uz', 'Dilshod', 'Rahimov', 1, 1, 'user', 'Technical Supervisor');
+
+-- Technical Supervisor in Toshkent viloyati
+INSERT INTO users (name, username, password, email, first_name, last_name, organization_id, region_id, role, user_type) VALUES
+    ('Sardor Tursunov', 's.tursunov', '$2b$10$qE5QvKrDJE5amJlbqicNOefXCa7j1lCzNSxGWdAW9ryJ7lAoahiv.', 's.tursunov@qurilish.uz', 'Sardor', 'Tursunov', 2, 2, 'user', 'Technical Supervisor');
 
 -- Success message
 DO $$

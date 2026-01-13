@@ -1,0 +1,34 @@
+{
+  "folders": [
+    {
+      "name": "Client",
+      "path": "./client"
+    },
+    {
+      "name": "Server",
+      "path": "./server"
+    },
+    {
+      "name": "Root",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "client/node_modules/typescript/lib",
+    "eslint.workingDirectories": [
+      {
+        "directory": "./client",
+        "changeProcessCWD": true
+      },
+      {
+        "directory": "./server",
+        "changeProcessCWD": true
+      }
+    ],
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.git": true
+    }
+  }
+}

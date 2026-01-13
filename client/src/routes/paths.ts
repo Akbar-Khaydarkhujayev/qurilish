@@ -43,12 +43,16 @@ export const paths = {
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,
-    two: `${ROOTS.DASHBOARD}/two`,
-    three: `${ROOTS.DASHBOARD}/three`,
-    group: {
-      root: `${ROOTS.DASHBOARD}/group`,
-      five: `${ROOTS.DASHBOARD}/group/five`,
-      six: `${ROOTS.DASHBOARD}/group/six`,
+    buildings: `${ROOTS.DASHBOARD}/buildings`,
+    settings: {
+      organizations: `${ROOTS.DASHBOARD}/settings/organizations`,
+      users: `${ROOTS.DASHBOARD}/settings/users`,
+      regions: `${ROOTS.DASHBOARD}/settings/regions`,
+      districts: `${ROOTS.DASHBOARD}/settings/districts`,
+      projectOrganizations: `${ROOTS.DASHBOARD}/settings/project-organizations`,
+      contractors: `${ROOTS.DASHBOARD}/settings/contractors`,
+      constructionStatuses: `${ROOTS.DASHBOARD}/settings/construction-statuses`,
+      constructionItems: `${ROOTS.DASHBOARD}/settings/construction-items`,
     },
   },
 };

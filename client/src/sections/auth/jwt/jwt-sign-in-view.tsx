@@ -28,10 +28,9 @@ import { signInWithPassword } from 'src/auth/context/jwt';
 export type SignInSchemaType = zod.infer<typeof SignInSchema>;
 
 export const SignInSchema = zod.object({
-  email: zod
+  username: zod
     .string()
-    .min(1, { message: 'Email is required!' })
-    .email({ message: 'Email must be a valid email address!' }),
+    .min(1, { message: 'Username is required!' }),
   password: zod
     .string()
     .min(1, { message: 'Password is required!' })
@@ -50,8 +49,8 @@ export function JwtSignInView() {
   const password = useBoolean();
 
   const defaultValues = {
-    email: 'demo@minimals.cc',
-    password: '@demo1',
+    username: 'superadmin',
+    password: 'admin123',
   };
 
   const methods = useForm<SignInSchemaType>({
@@ -66,7 +65,7 @@ export function JwtSignInView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await signInWithPassword({ email: data.email, password: data.password });
+      await signInWithPassword({ username: data.username, password: data.password });
       await checkUserSession?.();
 
       router.refresh();
@@ -94,36 +93,24 @@ export function JwtSignInView() {
 
   const renderForm = (
     <Stack spacing={3}>
-      <Field.Text name="email" label="Email address" InputLabelProps={{ shrink: true }} />
+      <Field.Text name="username" label="Username" InputLabelProps={{ shrink: true }} />
 
-      <Stack spacing={1.5}>
-        <Link
-          component={RouterLink}
-          href="#"
-          variant="body2"
-          color="inherit"
-          sx={{ alignSelf: 'flex-end' }}
-        >
-          Forgot password?
-        </Link>
-
-        <Field.Text
-          name="password"
-          label="Password"
-          placeholder="6+ characters"
-          type={password.value ? 'text' : 'password'}
-          InputLabelProps={{ shrink: true }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={password.onToggle} edge="end">
-                  <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Stack>
+      <Field.Text
+        name="password"
+        label="Password"
+        placeholder="6+ characters"
+        type={password.value ? 'text' : 'password'}
+        InputLabelProps={{ shrink: true }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={password.onToggle} edge="end">
+                <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
 
       <LoadingButton
         fullWidth
@@ -144,7 +131,7 @@ export function JwtSignInView() {
       {renderHead}
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Use <strong>{defaultValues.email}</strong>
+        Use <strong>{defaultValues.username}</strong>
         {' with password '}
         <strong>{defaultValues.password}</strong>
       </Alert>

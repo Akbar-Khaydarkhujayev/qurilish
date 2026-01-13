@@ -28,12 +28,16 @@ import { useAuthContext } from 'src/auth/hooks';
 export type SignUpSchemaType = zod.infer<typeof SignUpSchema>;
 
 export const SignUpSchema = zod.object({
-  firstName: zod.string().min(1, { message: 'First name is required!' }),
-  lastName: zod.string().min(1, { message: 'Last name is required!' }),
+  username: zod.string().min(1, { message: 'Username is required!' }),
+  name: zod.string().min(1, { message: 'Full name is required!' }),
   email: zod
     .string()
-    .min(1, { message: 'Email is required!' })
-    .email({ message: 'Email must be a valid email address!' }),
+    .email({ message: 'Email must be a valid email address!' })
+    .optional()
+    .or(zod.literal('')),
+  firstName: zod.string().optional(),
+  lastName: zod.string().optional(),
+  organizationId: zod.number().min(1, { message: 'Organization is required!' }),
   password: zod
     .string()
     .min(1, { message: 'Password is required!' })
@@ -52,10 +56,13 @@ export function JwtSignUpView() {
   const [errorMsg, setErrorMsg] = useState('');
 
   const defaultValues = {
-    firstName: 'Hello',
-    lastName: 'Friend',
-    email: 'hello@gmail.com',
-    password: '@demo1',
+    username: '',
+    name: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    organizationId: 1,
+    password: '',
   };
 
   const methods = useForm<SignUpSchemaType>({
@@ -71,10 +78,13 @@ export function JwtSignUpView() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       await signUp({
+        username: data.username,
+        name: data.name,
         email: data.email,
-        password: data.password,
         firstName: data.firstName,
         lastName: data.lastName,
+        organizationId: data.organizationId,
+        password: data.password,
       });
       await checkUserSession?.();
 
@@ -103,12 +113,16 @@ export function JwtSignUpView() {
 
   const renderForm = (
     <Stack spacing={3}>
+      <Field.Text name="username" label="Username" InputLabelProps={{ shrink: true }} />
+
+      <Field.Text name="name" label="Full name" InputLabelProps={{ shrink: true }} />
+
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-        <Field.Text name="firstName" label="First name" InputLabelProps={{ shrink: true }} />
-        <Field.Text name="lastName" label="Last name" InputLabelProps={{ shrink: true }} />
+        <Field.Text name="firstName" label="First name (optional)" InputLabelProps={{ shrink: true }} />
+        <Field.Text name="lastName" label="Last name (optional)" InputLabelProps={{ shrink: true }} />
       </Stack>
 
-      <Field.Text name="email" label="Email address" InputLabelProps={{ shrink: true }} />
+      <Field.Text name="email" label="Email address (optional)" InputLabelProps={{ shrink: true }} />
 
       <Field.Text
         name="password"

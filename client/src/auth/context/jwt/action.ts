@@ -6,27 +6,30 @@ import { STORAGE_KEY } from './constant';
 // ----------------------------------------------------------------------
 
 export type SignInParams = {
-  email: string;
+  username: string;
   password: string;
 };
 
 export type SignUpParams = {
-  email: string;
+  username: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  name: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  organizationId: number;
 };
 
 /** **************************************
  * Sign in
  *************************************** */
-export const signInWithPassword = async ({ email, password }: SignInParams): Promise<void> => {
+export const signInWithPassword = async ({ username, password }: SignInParams): Promise<void> => {
   try {
-    const params = { email, password };
+    const params = { username, password };
 
     const res = await axios.post(endpoints.auth.signIn, params);
 
-    const { accessToken } = res.data;
+    const { accessToken } = res.data.data;
 
     if (!accessToken) {
       throw new Error('Access token not found in response');
@@ -43,22 +46,28 @@ export const signInWithPassword = async ({ email, password }: SignInParams): Pro
  * Sign up
  *************************************** */
 export const signUp = async ({
-  email,
+  username,
   password,
+  name,
+  email,
   firstName,
   lastName,
+  organizationId,
 }: SignUpParams): Promise<void> => {
   const params = {
-    email,
+    username,
     password,
+    name,
+    email,
     firstName,
     lastName,
+    organizationId,
   };
 
   try {
     const res = await axios.post(endpoints.auth.signUp, params);
 
-    const { accessToken } = res.data;
+    const { accessToken } = res.data.data;
 
     if (!accessToken) {
       throw new Error('Access token not found in response');

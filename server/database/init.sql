@@ -97,6 +97,7 @@ CREATE TABLE organizations (
 );
 
 -- Create users table (foydalanuvchilar)
+-- Roles: super_admin, region_admin, user (technical supervisor)
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -106,11 +107,13 @@ CREATE TABLE users (
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE RESTRICT,
-    role VARCHAR(50) NOT NULL DEFAULT 'User',
+    region_id INTEGER REFERENCES regions(id) ON DELETE RESTRICT,
+    role VARCHAR(50) NOT NULL DEFAULT 'user',
     user_type VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_deleted BOOLEAN DEFAULT FALSE
+    is_deleted BOOLEAN DEFAULT FALSE,
+    CONSTRAINT check_role CHECK (role IN ('super_admin', 'region_admin', 'user'))
 );
 
 -- Create object_card table (obyekt_kartasi)

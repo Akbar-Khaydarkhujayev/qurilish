@@ -1,15 +1,20 @@
+
+import type { SupportedLocale } from 'src/locales';
 import type { IconButtonProps } from '@mui/material/IconButton';
 
 import { m } from 'framer-motion';
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 
+import { useLocalization } from 'src/locales/localization-provider';
+
 import { varHover } from 'src/components/animate';
 import { FlagIcon } from 'src/components/iconify';
 import { usePopover, CustomPopover } from 'src/components/custom-popover';
+
 
 // ----------------------------------------------------------------------
 
@@ -24,16 +29,16 @@ export type LanguagePopoverProps = IconButtonProps & {
 export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProps) {
   const popover = usePopover();
 
-  const [locale, setLocale] = useState<string>(data[0].value);
+  const { locale, setLocale } = useLocalization();
 
   const currentLang = data.find((lang) => lang.value === locale);
 
   const handleChangeLang = useCallback(
     (newLang: string) => {
-      setLocale(newLang);
+      setLocale(newLang as SupportedLocale);
       popover.onClose();
     },
-    [popover]
+    [popover, setLocale]
   );
 
   return (

@@ -20,6 +20,8 @@ export interface TokenPayload {
 }
 
 // User types
+export type UserRole = 'super_admin' | 'region_admin' | 'user';
+
 export interface User {
   id: number;
   name: string;
@@ -29,7 +31,8 @@ export interface User {
   first_name?: string;
   last_name?: string;
   organization_id: number;
-  role: string;
+  region_id?: number;
+  role: UserRole;
   user_type?: string;
   created_at?: Date;
   updated_at?: Date;

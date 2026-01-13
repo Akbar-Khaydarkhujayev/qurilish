@@ -1,4 +1,19 @@
-export type UserType = Record<string, any> | null;
+// User role types matching backend
+export type UserRole = 'super_admin' | 'region_admin' | 'user';
+
+export type UserType = {
+  id: number;
+  name: string;
+  username: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  organizationId: number;
+  regionId?: number;
+  role: UserRole;
+  userType?: string;
+  accessToken?: string;
+} | null;
 
 export type AuthState = {
   user: UserType;

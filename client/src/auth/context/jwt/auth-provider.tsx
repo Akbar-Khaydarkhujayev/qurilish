@@ -37,9 +37,10 @@ export function AuthProvider({ children }: Props) {
 
         const res = await axios.get(endpoints.auth.me);
 
-        const { user } = res.data;
+        // Backend returns data directly (not wrapped in { user })
+        const userData = res.data.data;
 
-        setState({ user: { ...user, accessToken }, loading: false });
+        setState({ user: { ...userData, accessToken }, loading: false });
       } else {
         setState({ user: null, loading: false });
       }

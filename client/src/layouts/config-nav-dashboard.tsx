@@ -43,30 +43,34 @@ const ICONS = {
 
 export const navData = [
   /**
-   * Overview
+   * Main
    */
   {
-    subheader: 'Overview 6.0.0',
+    subheader: 'Main',
     items: [
-      { title: 'One', path: paths.dashboard.root, icon: ICONS.dashboard },
-      { title: 'Two', path: paths.dashboard.two, icon: ICONS.ecommerce },
-      { title: 'Three', path: paths.dashboard.three, icon: ICONS.analytics },
+      { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
+      { title: 'Buildings', path: paths.dashboard.buildings, icon: ICONS.banking },
     ],
   },
   /**
-   * Management
+   * Settings
    */
   {
-    subheader: 'Management',
+    subheader: 'Settings',
     items: [
       {
-        title: 'Group',
-        path: paths.dashboard.group.root,
-        icon: ICONS.user,
+        title: 'Settings',
+        path: paths.dashboard.settings.organizations,
+        icon: ICONS.parameter,
         children: [
-          { title: 'Four', path: paths.dashboard.group.root },
-          { title: 'Five', path: paths.dashboard.group.five },
-          { title: 'Six', path: paths.dashboard.group.six },
+          { title: 'Organizations', path: paths.dashboard.settings.organizations },
+          { title: 'Users', path: paths.dashboard.settings.users },
+          { title: 'Regions', path: paths.dashboard.settings.regions },
+          { title: 'Districts', path: paths.dashboard.settings.districts },
+          { title: 'Project Organizations', path: paths.dashboard.settings.projectOrganizations },
+          { title: 'Contractors', path: paths.dashboard.settings.contractors },
+          { title: 'Construction Statuses', path: paths.dashboard.settings.constructionStatuses },
+          { title: 'Construction Items', path: paths.dashboard.settings.constructionItems },
         ],
       },
     ],

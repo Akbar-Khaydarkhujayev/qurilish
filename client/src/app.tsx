@@ -1,4 +1,7 @@
+
 import 'src/global.css';
+
+import { LocalizationProvider } from 'src/locales/localization-provider';
 
 // ----------------------------------------------------------------------
 
@@ -20,16 +23,18 @@ export default function App() {
   useScrollToTop();
 
   return (
-    <AuthProvider>
-      <SettingsProvider settings={defaultSettings}>
-        <ThemeProvider>
-          <MotionLazy>
-            <ProgressBar />
-            <SettingsDrawer />
-            <Router />
-          </MotionLazy>
-        </ThemeProvider>
-      </SettingsProvider>
-    </AuthProvider>
+    <LocalizationProvider>
+      <AuthProvider>
+        <SettingsProvider settings={defaultSettings}>
+          <ThemeProvider>
+            <MotionLazy>
+              <ProgressBar />
+              <SettingsDrawer />
+              <Router />
+            </MotionLazy>
+          </ThemeProvider>
+        </SettingsProvider>
+      </AuthProvider>
+    </LocalizationProvider>
   );
 }
