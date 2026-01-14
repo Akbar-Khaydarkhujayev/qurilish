@@ -1,4 +1,4 @@
-import type { ConstructionItem } from 'src/types/construction';
+import type { Contractor } from 'src/types/construction';
 
 import { useState, useCallback } from 'react';
 
@@ -27,24 +27,28 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 
-import { ConstructionItemTableRow } from './construction-item-table-row';
-import { ConstructionItemFormDialog } from './construction-item-form-dialog';
+import { ContractorTableRow } from './contractor-table-row';
+import { ContractorFormDialog } from './contractor-form-dialog';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name' },
+  { id: 'taxId', label: 'Tax ID' },
+  { id: 'address', label: 'Address' },
+  { id: 'phoneNumber', label: 'Phone' },
+  { id: 'mfo', label: 'MFO' },
   { id: 'actions', label: 'Actions', width: 88 },
 ];
 
 // ----------------------------------------------------------------------
 
-export function ConstructionItemsView() {
+export function ContractorsView() {
   const { t } = useTranslate();
   const table = useTable();
 
-  const [tableData, setTableData] = useState<ConstructionItem[]>([]);
-  const [editingItem, setEditingItem] = useState<ConstructionItem | null>(null);
+  const [tableData, setTableData] = useState<Contractor[]>([]);
+  const [editingItem, setEditingItem] = useState<Contractor | null>(null);
 
   const formDialog = useBoolean();
 
@@ -66,7 +70,7 @@ export function ConstructionItemsView() {
   }, [formDialog]);
 
   const handleEdit = useCallback(
-    (item: ConstructionItem) => {
+    (item: Contractor) => {
       setEditingItem(item);
       formDialog.onTrue();
     },
@@ -82,7 +86,7 @@ export function ConstructionItemsView() {
   );
 
   const handleSave = useCallback(
-    (item: ConstructionItem) => {
+    (item: Contractor) => {
       if (editingItem) {
         setTableData((prev) => prev.map((i) => (i.id === item.id ? item : i)));
       } else {
@@ -95,22 +99,22 @@ export function ConstructionItemsView() {
 
   return (
     <>
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ flexGrow: 1 }}>
-            {t('settings.constructionItems')}
+            {t('contractors')}
           </Typography>
           <Button
             variant="contained"
             startIcon={<Iconify icon="mingcute:add-line" />}
             onClick={handleAddNew}
           >
-            {t('common.add')}
+            {t('add')}
           </Button>
         </Box>
 
-        <Card>
-          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+        <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <TableContainer sx={{ position: 'relative', overflow: 'unset', flex: 1 }}>
             <TableSelectedAction
               dense={table.dense}
               numSelected={table.selected.length}
@@ -123,7 +127,7 @@ export function ConstructionItemsView() {
               }
               action={
                 <Button color="primary" onClick={() => console.log('Delete selected')}>
-                  {t('common.delete')}
+                  {t('delete')}
                 </Button>
               }
             />
@@ -135,7 +139,18 @@ export function ConstructionItemsView() {
                   orderBy={table.orderBy}
                   headLabel={TABLE_HEAD.map((head) => ({
                     ...head,
-                    label: head.id === 'name' ? t('common.name') : t('common.actions'),
+                    label:
+                      head.id === 'name'
+                        ? t('name')
+                        : head.id === 'taxId'
+                          ? t('taxId')
+                          : head.id === 'address'
+                            ? t('address')
+                            : head.id === 'phoneNumber'
+                              ? t('phoneNumber')
+                              : head.id === 'mfo'
+                                ? t('mfo')
+                                : t('actions'),
                   }))}
                   rowCount={dataFiltered.length}
                   numSelected={table.selected.length}
@@ -150,7 +165,7 @@ export function ConstructionItemsView() {
 
                 <TableBody>
                   {dataInPage.map((row) => (
-                    <ConstructionItemTableRow
+                    <ContractorTableRow
                       key={row.id}
                       row={row}
                       selected={table.selected.includes(row.id.toString())}
@@ -172,18 +187,14 @@ export function ConstructionItemsView() {
           </TableContainer>
 
           <TablePaginationCustom
-            page={table.page}
-            dense={table.dense}
             count={dataFiltered.length}
-            rowsPerPage={table.rowsPerPage}
-            onPageChange={table.onChangePage}
             onChangeDense={table.onChangeDense}
             onRowsPerPageChange={table.onChangeRowsPerPage}
           />
         </Card>
       </Box>
 
-      <ConstructionItemFormDialog
+      <ContractorFormDialog
         open={formDialog.value}
         onClose={formDialog.onFalse}
         editingItem={editingItem}
@@ -199,7 +210,7 @@ function applyFilter({
   inputData,
   comparator,
 }: {
-  inputData: ConstructionItem[];
+  inputData: Contractor[];
   comparator: (a: any, b: any) => number;
 }) {
   const stabilizedThis = inputData.map((el, index) => [el, index] as const);

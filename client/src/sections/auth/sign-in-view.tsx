@@ -3,21 +3,19 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import Link from '@mui/material/Link';
-import Alert from '@mui/material/Alert';
+import { Alert } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
-import { RouterLink } from 'src/routes/components';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
 import { Iconify } from 'src/components/iconify';
+import { AnimateLogo2 } from 'src/components/animate';
 import { Form, Field } from 'src/components/hook-form';
 
 import { useAuthContext } from 'src/auth/hooks';
@@ -28,25 +26,20 @@ import { signInWithPassword } from 'src/auth/context/jwt';
 export type SignInSchemaType = zod.infer<typeof SignInSchema>;
 
 export const SignInSchema = zod.object({
-  username: zod
-    .string()
-    .min(1, { message: 'Username is required!' }),
-  password: zod
-    .string()
-    .min(1, { message: 'Password is required!' })
-    .min(6, { message: 'Password must be at least 6 characters!' }),
+  username: zod.string().min(1, { message: 'Required!' }),
+  password: zod.string().min(1, { message: 'Required!' }),
 });
 
 // ----------------------------------------------------------------------
 
-export function JwtSignInView() {
+export function SignInView() {
+  const password = useBoolean();
+
   const router = useRouter();
 
   const { checkUserSession } = useAuthContext();
 
   const [errorMsg, setErrorMsg] = useState('');
-
-  const password = useBoolean();
 
   const defaultValues = {
     username: 'superadmin',
@@ -75,19 +68,11 @@ export function JwtSignInView() {
     }
   });
 
+  const renderLogo = <AnimateLogo2 sx={{ mb: 3, mx: 'auto' }} />;
+
   const renderHead = (
-    <Stack spacing={1.5} sx={{ mb: 5 }}>
+    <Stack alignItems="center" spacing={1.5} sx={{ mb: 5 }}>
       <Typography variant="h5">Sign in to your account</Typography>
-
-      <Stack direction="row" spacing={0.5}>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {`Don't have an account?`}
-        </Typography>
-
-        <Link component={RouterLink} href={paths.auth.jwt.signUp} variant="subtitle2">
-          Get started
-        </Link>
-      </Stack>
     </Stack>
   );
 
@@ -95,22 +80,24 @@ export function JwtSignInView() {
     <Stack spacing={3}>
       <Field.Text name="username" label="Username" InputLabelProps={{ shrink: true }} />
 
-      <Field.Text
-        name="password"
-        label="Password"
-        placeholder="6+ characters"
-        type={password.value ? 'text' : 'password'}
-        InputLabelProps={{ shrink: true }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={password.onToggle} edge="end">
-                <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+      <Stack spacing={1.5}>
+        <Field.Text
+          name="password"
+          label="Password"
+          placeholder="6+ characters"
+          type={password.value ? 'text' : 'password'}
+          InputLabelProps={{ shrink: true }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={password.onToggle} edge="end">
+                  <Iconify icon={password.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Stack>
 
       <LoadingButton
         fullWidth
@@ -128,13 +115,9 @@ export function JwtSignInView() {
 
   return (
     <>
-      {renderHead}
+      {renderLogo}
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Use <strong>{defaultValues.username}</strong>
-        {' with password '}
-        <strong>{defaultValues.password}</strong>
-      </Alert>
+      {renderHead}
 
       {!!errorMsg && (
         <Alert severity="error" sx={{ mb: 3 }}>

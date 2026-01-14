@@ -1,14 +1,40 @@
+import { Outlet } from 'react-router';
 import { lazy, Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
 
-import { SplashScreen } from 'src/components/loading-screen';
+import { CONFIG } from 'src/config-global';
+import { DashboardLayout } from 'src/layouts/dashboard';
+
+import { SplashScreen, LoadingScreen } from 'src/components/loading-screen';
+
+import { AuthGuard } from 'src/auth/guard';
 
 // ----------------------------------------------------------------------
 
-// Error
 const Page404 = lazy(() => import('src/pages/error/404'));
+const IndexPage = lazy(() => import('src/pages/dashboard/one'));
+const BuildingsPage = lazy(() => import('src/pages/dashboard/buildings'));
+const OrganizationsPage = lazy(() => import('src/pages/dashboard/settings/organizations'));
+const UsersPage = lazy(() => import('src/pages/dashboard/settings/users'));
+const RegionsPage = lazy(() => import('src/pages/dashboard/settings/regions'));
+const DistrictsPage = lazy(() => import('src/pages/dashboard/settings/districts'));
+const ProjectOrganizationsPage = lazy(
+  () => import('src/pages/dashboard/settings/project-organizations')
+);
+const ContractorsPage = lazy(() => import('src/pages/dashboard/settings/contractors'));
+const ConstructionStatusesPage = lazy(
+  () => import('src/pages/dashboard/settings/construction-statuses')
+);
+const ConstructionItemsPage = lazy(() => import('src/pages/dashboard/settings/construction-items'));
 
 // ----------------------------------------------------------------------
+
+const layoutContent = (
+  <DashboardLayout>
+    <Suspense fallback={<LoadingScreen />}>
+      <Outlet />
+    </Suspense>
+  </DashboardLayout>
+);
 
 export const mainRoutes = [
   {
@@ -18,5 +44,26 @@ export const mainRoutes = [
       </Suspense>
     ),
     children: [{ path: '404', element: <Page404 /> }],
+  },
+  {
+    // Pathless layout route: No 'path' here means it doesn't affect the URL
+    element: CONFIG.auth.skip ? <>{layoutContent}</> : <AuthGuard>{layoutContent}</AuthGuard>,
+    children: [
+      { path: 'dashboard', element: <IndexPage /> }, // URL: /dashboard
+      { path: 'buildings', element: <BuildingsPage /> }, // URL: /buildings
+      {
+        path: 'settings', // URL starts with /settings
+        children: [
+          { path: 'organizations', element: <OrganizationsPage /> }, // URL: /settings/organizations
+          { path: 'users', element: <UsersPage /> },
+          { path: 'regions', element: <RegionsPage /> },
+          { path: 'districts', element: <DistrictsPage /> },
+          { path: 'project-organizations', element: <ProjectOrganizationsPage /> },
+          { path: 'contractors', element: <ContractorsPage /> },
+          { path: 'construction-statuses', element: <ConstructionStatusesPage /> },
+          { path: 'construction-items', element: <ConstructionItemsPage /> },
+        ],
+      },
+    ],
   },
 ];

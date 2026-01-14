@@ -3,56 +3,31 @@
 const ROOTS = {
   AUTH: '/auth',
   DASHBOARD: '/dashboard',
+  BUILDINGS: '/buildings',
+  SETTINGS: '/settings',
 };
 
 // ----------------------------------------------------------------------
 
 export const paths = {
-  faqs: '/faqs',
-  minimalStore: 'https://mui.com/store/items/minimal-dashboard/',
   // AUTH
   auth: {
-    amplify: {
-      signIn: `${ROOTS.AUTH}/amplify/sign-in`,
-      verify: `${ROOTS.AUTH}/amplify/verify`,
-      signUp: `${ROOTS.AUTH}/amplify/sign-up`,
-      updatePassword: `${ROOTS.AUTH}/amplify/update-password`,
-      resetPassword: `${ROOTS.AUTH}/amplify/reset-password`,
-    },
-    jwt: {
-      signIn: `${ROOTS.AUTH}/jwt/sign-in`,
-      signUp: `${ROOTS.AUTH}/jwt/sign-up`,
-    },
-    firebase: {
-      signIn: `${ROOTS.AUTH}/firebase/sign-in`,
-      verify: `${ROOTS.AUTH}/firebase/verify`,
-      signUp: `${ROOTS.AUTH}/firebase/sign-up`,
-      resetPassword: `${ROOTS.AUTH}/firebase/reset-password`,
-    },
-    auth0: {
-      signIn: `${ROOTS.AUTH}/auth0/sign-in`,
-    },
-    supabase: {
-      signIn: `${ROOTS.AUTH}/supabase/sign-in`,
-      verify: `${ROOTS.AUTH}/supabase/verify`,
-      signUp: `${ROOTS.AUTH}/supabase/sign-up`,
-      updatePassword: `${ROOTS.AUTH}/supabase/update-password`,
-      resetPassword: `${ROOTS.AUTH}/supabase/reset-password`,
-    },
+    signIn: `${ROOTS.AUTH}/jwt/sign-in`,
+    signUp: `${ROOTS.AUTH}/jwt/sign-up`,
   },
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,
-    buildings: `${ROOTS.DASHBOARD}/buildings`,
-    settings: {
-      organizations: `${ROOTS.DASHBOARD}/settings/organizations`,
-      users: `${ROOTS.DASHBOARD}/settings/users`,
-      regions: `${ROOTS.DASHBOARD}/settings/regions`,
-      districts: `${ROOTS.DASHBOARD}/settings/districts`,
-      projectOrganizations: `${ROOTS.DASHBOARD}/settings/project-organizations`,
-      contractors: `${ROOTS.DASHBOARD}/settings/contractors`,
-      constructionStatuses: `${ROOTS.DASHBOARD}/settings/construction-statuses`,
-      constructionItems: `${ROOTS.DASHBOARD}/settings/construction-items`,
-    },
+  },
+  buildings: ROOTS.BUILDINGS,
+  settings: {
+    organizations: `${ROOTS.SETTINGS}/organizations`,
+    users: `${ROOTS.SETTINGS}/users`,
+    regions: `${ROOTS.SETTINGS}/regions`,
+    districts: `${ROOTS.SETTINGS}/districts`,
+    projectOrganizations: `${ROOTS.SETTINGS}/project-organizations`,
+    contractors: `${ROOTS.SETTINGS}/contractors`,
+    constructionStatuses: `${ROOTS.SETTINGS}/construction-statuses`,
+    constructionItems: `${ROOTS.SETTINGS}/construction-items`,
   },
 };

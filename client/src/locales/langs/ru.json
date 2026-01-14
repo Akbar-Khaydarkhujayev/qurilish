@@ -54,5 +54,6 @@
   "saveSuccess": "Сохранено успешно",
   "deleteSuccess": "Удалено успешно",
   "updateSuccess": "Обновлено успешно",
-  "createSuccess": "Создано успешно"
+  "createSuccess": "Создано успешно",
+  "role": "Роль"
 }

@@ -72,25 +72,20 @@ export function RegionFormDialog({ open, onClose, editingItem, onSave }: Props) 
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose}>
       <Form methods={methods} onSubmit={onSubmit}>
-        <DialogTitle>{editingItem ? t('common.edit') : t('common.add')}</DialogTitle>
+        <DialogTitle>{editingItem ? t('edit') : t('add')}</DialogTitle>
 
         <DialogContent>
           <Box sx={{ pt: 1 }}>
-            <Field.Text
-              name="name"
-              label={t('common.name')}
-              required
-              InputLabelProps={{ shrink: true }}
-            />
+            <Field.Text name="name" label={t('name')} required InputLabelProps={{ shrink: true }} />
           </Box>
         </DialogContent>
 
         <DialogActions>
           <Button variant="outlined" onClick={handleClose}>
-            {t('common.cancel')}
+            {t('cancel')}
           </Button>
           <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-            {t('common.save')}
+            {t('save')}
           </LoadingButton>
         </DialogActions>
       </Form>

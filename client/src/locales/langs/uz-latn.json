@@ -54,5 +54,6 @@
   "saveSuccess": "Muvaffaqiyatli saqlandi",
   "deleteSuccess": "Muvaffaqiyatli o'chirildi",
   "updateSuccess": "Muvaffaqiyatli yangilandi",
-  "createSuccess": "Muvaffaqiyatli yaratildi"
+  "createSuccess": "Muvaffaqiyatli yaratildi",
+  "role": "Rol"
 }

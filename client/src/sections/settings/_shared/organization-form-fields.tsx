@@ -12,30 +12,21 @@ export function OrganizationFormFields() {
 
   return (
     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Field.Text
-        name="name"
-        label={t('common.name')}
-        required
-        InputLabelProps={{ shrink: true }}
-      />
+      <Field.Text name="name" label={t('name')} required InputLabelProps={{ shrink: true }} />
 
-      <Field.Text name="taxId" label={t('common.taxId')} InputLabelProps={{ shrink: true }} />
+      <Field.Text name="taxId" label={t('taxId')} InputLabelProps={{ shrink: true }} />
 
       <Field.Text
         name="address"
-        label={t('common.address')}
+        label={t('address')}
         multiline
         rows={2}
         InputLabelProps={{ shrink: true }}
       />
 
-      <Field.Text
-        name="phoneNumber"
-        label={t('common.phoneNumber')}
-        InputLabelProps={{ shrink: true }}
-      />
+      <Field.Text name="phoneNumber" label={t('phoneNumber')} InputLabelProps={{ shrink: true }} />
 
-      <Field.Text name="mfo" label={t('common.mfo')} InputLabelProps={{ shrink: true }} />
+      <Field.Text name="mfo" label={t('mfo')} InputLabelProps={{ shrink: true }} />
     </Box>
   );
 }

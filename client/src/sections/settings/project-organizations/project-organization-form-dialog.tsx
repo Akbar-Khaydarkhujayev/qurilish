@@ -1,9 +1,8 @@
-import type { ConstructionItem } from 'src/types/construction';
+import type { ProjectOrganization } from 'src/types/construction';
 
 import { useForm } from 'react-hook-form';
 import { useEffect, useCallback } from 'react';
 
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -13,27 +12,37 @@ import DialogContent from '@mui/material/DialogContent';
 
 import { useTranslate } from 'src/locales';
 
-import { Form, Field } from 'src/components/hook-form';
+import { Form } from 'src/components/hook-form';
+
+import { OrganizationFormFields } from '../_shared/organization-form-fields';
 
 // ----------------------------------------------------------------------
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  editingItem: ConstructionItem | null;
-  onSave: (data: ConstructionItem) => void;
+  editingItem: ProjectOrganization | null;
+  onSave: (data: ProjectOrganization) => void;
 };
 
 type FormValues = {
   name: string;
+  taxId: string;
+  address: string;
+  phoneNumber: string;
+  mfo: string;
 };
 
-export function ConstructionItemFormDialog({ open, onClose, editingItem, onSave }: Props) {
+export function ProjectOrganizationFormDialog({ open, onClose, editingItem, onSave }: Props) {
   const { t } = useTranslate();
 
   const methods = useForm<FormValues>({
     defaultValues: {
       name: '',
+      taxId: '',
+      address: '',
+      phoneNumber: '',
+      mfo: '',
     },
   });
 
@@ -45,17 +54,33 @@ export function ConstructionItemFormDialog({ open, onClose, editingItem, onSave 
 
   useEffect(() => {
     if (editingItem) {
-      reset({ name: editingItem.name });
+      reset({
+        name: editingItem.name,
+        taxId: editingItem.taxId || '',
+        address: editingItem.address || '',
+        phoneNumber: editingItem.phoneNumber || '',
+        mfo: editingItem.mfo || '',
+      });
     } else {
-      reset({ name: '' });
+      reset({
+        name: '',
+        taxId: '',
+        address: '',
+        phoneNumber: '',
+        mfo: '',
+      });
     }
   }, [editingItem, reset]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const item: ConstructionItem = {
-        id: editingItem?.id || Date.now(), // temporary ID for demo
+      const item: ProjectOrganization = {
+        id: editingItem?.id || Date.now(),
         name: data.name,
+        taxId: data.taxId || undefined,
+        address: data.address || undefined,
+        phoneNumber: data.phoneNumber || undefined,
+        mfo: data.mfo || undefined,
       };
       onSave(item);
       reset();
@@ -72,25 +97,18 @@ export function ConstructionItemFormDialog({ open, onClose, editingItem, onSave 
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose}>
       <Form methods={methods} onSubmit={onSubmit}>
-        <DialogTitle>{editingItem ? t('common.edit') : t('common.add')}</DialogTitle>
+        <DialogTitle>{editingItem ? t('edit') : t('add')}</DialogTitle>
 
         <DialogContent>
-          <Box sx={{ pt: 1 }}>
-            <Field.Text
-              name="name"
-              label={t('common.name')}
-              required
-              InputLabelProps={{ shrink: true }}
-            />
-          </Box>
+          <OrganizationFormFields />
         </DialogContent>
 
         <DialogActions>
           <Button variant="outlined" onClick={handleClose}>
-            {t('common.cancel')}
+            {t('cancel')}
           </Button>
           <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-            {t('common.save')}
+            {t('save')}
           </LoadingButton>
         </DialogActions>
       </Form>

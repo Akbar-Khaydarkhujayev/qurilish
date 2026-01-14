@@ -51,11 +51,11 @@ export function DistrictTableRow({ row, selected, onEditRow, onSelectRow, onDele
       <ConfirmDialog
         open={confirm.value}
         onClose={confirm.onFalse}
-        title={t('common.delete')}
-        content={t('messages.deleteConfirm')}
+        title={t('delete')}
+        content={t('deleteConfirm')}
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
-            {t('common.delete')}
+            {t('delete')}
           </Button>
         }
       />

@@ -1,6 +1,6 @@
 import type { ApiResponse, Organization, PaginatedResponse } from 'src/types/construction';
 
-import axiosInstance from 'src/utils/axios-instance';
+import axiosInstance from 'src/utils/axios';
 
 // ----------------------------------------------------------------------
 

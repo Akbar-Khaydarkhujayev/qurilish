@@ -1,4 +1,4 @@
-import type { ConstructionItem } from 'src/types/construction';
+import type { Contractor } from 'src/types/construction';
 
 import Button from '@mui/material/Button';
 import TableRow from '@mui/material/TableRow';
@@ -16,14 +16,14 @@ import { ConfirmDialog } from 'src/components/custom-dialog';
 // ----------------------------------------------------------------------
 
 type Props = {
-  row: ConstructionItem;
+  row: Contractor;
   selected: boolean;
   onEditRow: () => void;
   onSelectRow: () => void;
   onDeleteRow: () => void;
 };
 
-export function ConstructionItemTableRow({
+export function ContractorTableRow({
   row,
   selected,
   onEditRow,
@@ -41,6 +41,10 @@ export function ConstructionItemTableRow({
         </TableCell>
 
         <TableCell>{row.name}</TableCell>
+        <TableCell>{row.taxId || '-'}</TableCell>
+        <TableCell>{row.address || '-'}</TableCell>
+        <TableCell>{row.phoneNumber || '-'}</TableCell>
+        <TableCell>{row.mfo || '-'}</TableCell>
 
         <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
           <IconButton color="primary" onClick={onEditRow}>
@@ -56,11 +60,11 @@ export function ConstructionItemTableRow({
       <ConfirmDialog
         open={confirm.value}
         onClose={confirm.onFalse}
-        title={t('common.delete')}
-        content={t('messages.deleteConfirm')}
+        title={t('delete')}
+        content={t('deleteConfirm')}
         action={
           <Button variant="contained" color="error" onClick={onDeleteRow}>
-            {t('common.delete')}
+            {t('delete')}
           </Button>
         }
       />

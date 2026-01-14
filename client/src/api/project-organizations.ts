@@ -1,10 +1,6 @@
-import type {
-  ApiResponse,
-  PaginatedResponse,
-  ProjectOrganization,
-} from 'src/types/construction';
+import type { ApiResponse, PaginatedResponse, ProjectOrganization } from 'src/types/construction';
 
-import axiosInstance from 'src/utils/axios-instance';
+import axiosInstance from 'src/utils/axios';
 
 // ----------------------------------------------------------------------
 
@@ -27,9 +23,7 @@ export const projectOrganizationsApi = {
 
   // Get single project organization by ID
   getById: async (id: number): Promise<ProjectOrganization> => {
-    const response = await axiosInstance.get<ApiResponse<ProjectOrganization>>(
-      `${BASE_URL}/${id}`
-    );
+    const response = await axiosInstance.get<ApiResponse<ProjectOrganization>>(`${BASE_URL}/${id}`);
     return response.data.data;
   },
 
@@ -40,10 +34,7 @@ export const projectOrganizationsApi = {
   },
 
   // Update project organization
-  update: async (
-    id: number,
-    data: Partial<ProjectOrganization>
-  ): Promise<ProjectOrganization> => {
+  update: async (id: number, data: Partial<ProjectOrganization>): Promise<ProjectOrganization> => {
     const response = await axiosInstance.put<ApiResponse<ProjectOrganization>>(
       `${BASE_URL}/${id}`,
       data

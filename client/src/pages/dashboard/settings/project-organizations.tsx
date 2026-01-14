@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { BlankView } from 'src/sections/blank/view';
+import { ProjectOrganizationsView } from 'src/sections/settings/project-organizations/project-organizations-view';
 
 // ----------------------------------------------------------------------
 
@@ -12,10 +12,10 @@ export default function Page() {
   return (
     <>
       <Helmet>
-        <title> {metadata.title}</title>
+        <title>{metadata.title}</title>
       </Helmet>
 
-      <BlankView title="Project Organizations" />
+      <ProjectOrganizationsView />
     </>
   );
 }

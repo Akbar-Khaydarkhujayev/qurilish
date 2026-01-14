@@ -1,4 +1,4 @@
-import axios, { endpoints } from 'src/utils/axios';
+import axios from 'src/utils/axios';
 
 import { setSession } from './utils';
 import { STORAGE_KEY } from './constant';
@@ -27,7 +27,7 @@ export const signInWithPassword = async ({ username, password }: SignInParams): 
   try {
     const params = { username, password };
 
-    const res = await axios.post(endpoints.auth.signIn, params);
+    const res = await axios.post('/auth/sign-in', params);
 
     const { accessToken } = res.data.data;
 
@@ -65,7 +65,7 @@ export const signUp = async ({
   };
 
   try {
-    const res = await axios.post(endpoints.auth.signUp, params);
+    const res = await axios.post('/api/auth/sign-up', params);
 
     const { accessToken } = res.data.data;
 

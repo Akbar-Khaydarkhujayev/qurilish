@@ -93,25 +93,20 @@ export function DistrictFormDialog({ open, onClose, editingItem, onSave }: Props
   return (
     <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose}>
       <Form methods={methods} onSubmit={onSubmit}>
-        <DialogTitle>{editingItem ? t('common.edit') : t('common.add')}</DialogTitle>
+        <DialogTitle>{editingItem ? t('edit') : t('add')}</DialogTitle>
 
         <DialogContent>
           <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Field.Text
-              name="name"
-              label={t('common.name')}
-              required
-              InputLabelProps={{ shrink: true }}
-            />
+            <Field.Text name="name" label={t('name')} required InputLabelProps={{ shrink: true }} />
 
             <Field.Select
               name="regionId"
-              label={t('settings.regions')}
+              label={t('regions')}
               required
               InputLabelProps={{ shrink: true }}
             >
               <MenuItem value={0} disabled>
-                {t('common.select')}
+                {t('select')}
               </MenuItem>
               {MOCK_REGIONS.map((region) => (
                 <MenuItem key={region.id} value={region.id}>
@@ -124,10 +119,10 @@ export function DistrictFormDialog({ open, onClose, editingItem, onSave }: Props
 
         <DialogActions>
           <Button variant="outlined" onClick={handleClose}>
-            {t('common.cancel')}
+            {t('cancel')}
           </Button>
           <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-            {t('common.save')}
+            {t('save')}
           </LoadingButton>
         </DialogActions>
       </Form>

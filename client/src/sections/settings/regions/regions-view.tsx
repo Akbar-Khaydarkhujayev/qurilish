@@ -95,22 +95,22 @@ export function RegionsView() {
 
   return (
     <>
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" sx={{ flexGrow: 1 }}>
-            {t('settings.regions')}
+            {t('regions')}
           </Typography>
           <Button
             variant="contained"
             startIcon={<Iconify icon="mingcute:add-line" />}
             onClick={handleAddNew}
           >
-            {t('common.add')}
+            {t('add')}
           </Button>
         </Box>
 
-        <Card>
-          <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
+        <Card sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <TableContainer sx={{ position: 'relative', overflow: 'unset', flex: 1 }}>
             <TableSelectedAction
               dense={table.dense}
               numSelected={table.selected.length}
@@ -123,7 +123,7 @@ export function RegionsView() {
               }
               action={
                 <Button color="primary" onClick={() => console.log('Delete selected')}>
-                  {t('common.delete')}
+                  {t('delete')}
                 </Button>
               }
             />
@@ -135,7 +135,7 @@ export function RegionsView() {
                   orderBy={table.orderBy}
                   headLabel={TABLE_HEAD.map((head) => ({
                     ...head,
-                    label: head.id === 'name' ? t('common.name') : t('common.actions'),
+                    label: head.id === 'name' ? t('name') : t('actions'),
                   }))}
                   rowCount={dataFiltered.length}
                   numSelected={table.selected.length}
@@ -172,11 +172,8 @@ export function RegionsView() {
           </TableContainer>
 
           <TablePaginationCustom
-            page={table.page}
             dense={table.dense}
             count={dataFiltered.length}
-            rowsPerPage={table.rowsPerPage}
-            onPageChange={table.onChangePage}
             onChangeDense={table.onChangeDense}
             onRowsPerPageChange={table.onChangeRowsPerPage}
           />
