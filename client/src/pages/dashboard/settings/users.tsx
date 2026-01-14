@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { UsersView } from 'src/sections/settings/users/users-view';
+import UsersView from 'src/sections/settings/users/view';
 
 // ----------------------------------------------------------------------
 

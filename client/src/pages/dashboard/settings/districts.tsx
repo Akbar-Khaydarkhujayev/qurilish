@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { DistrictsView } from 'src/sections/settings/districts/districts-view';
+import DistrictsView from 'src/sections/settings/districts/view';
 
 // ----------------------------------------------------------------------
 

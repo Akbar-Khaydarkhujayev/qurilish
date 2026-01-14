@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { ContractorsView } from 'src/sections/settings/contractors/contractors-view';
+import ContractorsView from 'src/sections/settings/contractors/view';
 
 // ----------------------------------------------------------------------
 

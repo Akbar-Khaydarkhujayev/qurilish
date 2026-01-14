@@ -9,7 +9,7 @@ export const getAll = async (req: AuthRequest, res: Response): Promise<void> => 
     const { page, limit, offset } = parsePagination(req.query);
     const { sort_by, sort_order, search, region_id } = req.query;
 
-    const searchClause = buildSearchClause(['name'], search as string);
+    const searchClause = buildSearchClause(['districts.name'], search as string);
     const orderClause = buildOrderClause(sort_by as string, sort_order as string);
 
     let whereClause = 'WHERE districts.is_deleted = FALSE';

@@ -39,7 +39,6 @@ export function AuthCenteredLayout({ sx, children }: AuthCenteredLayoutProps) {
             purchase: false,
             contacts: false,
             searchbar: false,
-            workspaces: false,
             menuButton: false,
             localization: false,
             notifications: false,

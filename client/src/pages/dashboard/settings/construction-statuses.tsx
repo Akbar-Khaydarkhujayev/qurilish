@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { ConstructionStatusesView } from 'src/sections/settings/construction-statuses/construction-statuses-view';
+import ConstructionStatusesView from 'src/sections/settings/construction-statuses/view';
 
 // ----------------------------------------------------------------------
 

@@ -24,7 +24,6 @@ import { NavVertical } from './nav-vertical';
 import { NavHorizontal } from './nav-horizontal';
 import { _account } from '../config-nav-account';
 import { HeaderBase } from '../core/header-base';
-import { _workspaces } from '../config-nav-workspace';
 import { LayoutSection } from '../core/layout-section';
 import { navData as dashboardNavData } from '../config-nav-dashboard';
 
@@ -80,7 +79,6 @@ export function DashboardLayout({ sx, children, data }: DashboardLayoutProps) {
               langs: allLangs,
               account: _account,
               contacts: _contacts,
-              workspaces: _workspaces,
               notifications: _notifications,
             }}
             slotsDisplay={{
@@ -193,7 +191,9 @@ export function DashboardLayout({ sx, children, data }: DashboardLayoutProps) {
           ...sx,
         }}
       >
-        <Main isNavHorizontal={isNavHorizontal}>{children}</Main>
+        <Main isNavHorizontal={isNavHorizontal} sx={{ px: 4 }}>
+          {children}
+        </Main>
       </LayoutSection>
     </>
   );

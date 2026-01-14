@@ -53,6 +53,7 @@ export function RHFSelect({
           {...field}
           select
           fullWidth
+          value={field.value ?? ''}
           SelectProps={{
             native,
             MenuProps: { PaperProps: { sx: { maxHeight: 220, ...slotProps?.paper } } },

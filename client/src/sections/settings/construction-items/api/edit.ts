@@ -7,7 +7,7 @@ import type { FormFields } from './schema';
 const editConstructionItem = (input: FormFields) =>
   axiosInstance.put(`/construction-items/${input.id}`, input).then((res) => res.data);
 
-export const useEditConstructionItem = (id?: number) => {
+export const useEditConstructionItem = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -16,10 +16,9 @@ export const useEditConstructionItem = (id?: number) => {
       queryClient.invalidateQueries({
         queryKey: ['construction-items'],
       });
-      if (id)
-        queryClient.invalidateQueries({
-          queryKey: ['construction-item', id],
-        });
+      queryClient.invalidateQueries({
+        queryKey: ['construction-item'],
+      });
     },
   });
 };

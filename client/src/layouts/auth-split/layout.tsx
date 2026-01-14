@@ -42,7 +42,6 @@ export function AuthSplitLayout({ sx, section, children }: AuthSplitLayoutProps)
             purchase: false,
             contacts: false,
             searchbar: false,
-            workspaces: false,
             menuButton: false,
             localization: false,
             notifications: false,

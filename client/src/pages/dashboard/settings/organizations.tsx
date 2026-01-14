@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { OrganizationsView } from 'src/sections/settings/organizations/organizations-view';
+import OrganizationsView from 'src/sections/settings/organizations/view';
 
 // ----------------------------------------------------------------------
 

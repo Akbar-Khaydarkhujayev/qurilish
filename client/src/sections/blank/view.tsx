@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import { varAlpha } from 'src/theme/styles';
-import { DashboardContent } from 'src/layouts/dashboard';
 
 // ----------------------------------------------------------------------
 
@@ -12,7 +11,7 @@ type Props = {
 
 export function BlankView({ title = 'Blank' }: Props) {
   return (
-    <DashboardContent maxWidth="xl">
+    <Box maxWidth="xl">
       <Typography variant="h4"> {title} </Typography>
 
       <Box
@@ -25,6 +24,6 @@ export function BlankView({ title = 'Blank' }: Props) {
           border: (theme) => `dashed 1px ${theme.vars.palette.divider}`,
         }}
       />
-    </DashboardContent>
+    </Box>
   );
 }

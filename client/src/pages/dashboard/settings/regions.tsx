@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { RegionsView } from 'src/sections/settings/regions/regions-view';
+import RegionsView from 'src/sections/settings/regions/view';
 
 // ----------------------------------------------------------------------
 

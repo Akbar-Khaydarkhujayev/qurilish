@@ -33,7 +33,7 @@ export const ConstructionItemDialog = ({ open, onClose, editedConstructionItemId
   const { t } = useTranslate();
 
   const { data: constructionItem } = useGetConstructionItemById(editedConstructionItemId);
-  const { mutate: edit } = useEditConstructionItem(constructionItem?.data.id);
+  const { mutate: edit } = useEditConstructionItem();
   const { mutate: create } = useCreateConstructionItem();
 
   const methods = useForm<FormFields>({
