@@ -12,7 +12,7 @@ import TableContainer from '@mui/material/TableContainer';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
-import { useLocalization } from 'src/locales/use-localization';
+import { useTranslate } from 'src/locales';
 
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -41,7 +41,7 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 export function DistrictsView() {
-  const { t } = useLocalization();
+  const { t } = useTranslate();
   const table = useTable();
 
   const [tableData, setTableData] = useState<District[]>([]);

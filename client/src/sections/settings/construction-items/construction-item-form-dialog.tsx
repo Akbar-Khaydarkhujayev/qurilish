@@ -11,7 +11,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
-import { useLocalization } from 'src/locales/use-localization';
+import { useTranslate } from 'src/locales';
 
 import { Form, Field } from 'src/components/hook-form';
 
@@ -29,7 +29,7 @@ type FormValues = {
 };
 
 export function ConstructionItemFormDialog({ open, onClose, editingItem, onSave }: Props) {
-  const { t } = useLocalization();
+  const { t } = useTranslate();
 
   const methods = useForm<FormValues>({
     defaultValues: {

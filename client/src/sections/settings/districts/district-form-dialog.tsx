@@ -12,7 +12,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
-import { useLocalization } from 'src/locales/use-localization';
+import { useTranslate } from 'src/locales';
 
 import { Form, Field } from 'src/components/hook-form';
 
@@ -40,7 +40,7 @@ const MOCK_REGIONS = [
 ];
 
 export function DistrictFormDialog({ open, onClose, editingItem, onSave }: Props) {
-  const { t } = useLocalization();
+  const { t } = useTranslate();
 
   const methods = useForm<FormValues>({
     defaultValues: {

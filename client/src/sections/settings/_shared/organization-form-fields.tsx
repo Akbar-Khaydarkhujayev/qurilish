@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 
-import { useLocalization } from 'src/locales/use-localization';
+import { useTranslate } from 'src/locales';
 
 import { Field } from 'src/components/hook-form';
 
@@ -8,7 +8,7 @@ import { Field } from 'src/components/hook-form';
 
 // Shared form fields for Project Organizations and Contractors
 export function OrganizationFormFields() {
-  const { t } = useLocalization();
+  const { t } = useTranslate();
 
   return (
     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>

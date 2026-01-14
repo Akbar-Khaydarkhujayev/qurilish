@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
-import { useLocalization } from 'src/locales/use-localization';
+import { useTranslate } from 'src/locales';
 
 import { Iconify } from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
@@ -24,7 +24,7 @@ type Props = {
 };
 
 export function DistrictTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }: Props) {
-  const { t } = useLocalization();
+  const { t } = useTranslate();
   const confirm = useBoolean();
 
   return (

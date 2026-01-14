@@ -1,75 +1,30 @@
-import { useMemo, useState, useContext, useCallback, createContext } from 'react';
+/* eslint-disable perfectionist/sort-imports */
 
-import { translations, DEFAULT_LOCALE } from './index';
+import 'dayjs/locale/ru';
+import 'dayjs/locale/uz';
+import 'dayjs/locale/uz-latn';
 
-import type { TranslationKeys, SupportedLocale } from './index';
+import dayjs from 'dayjs';
 
-// ----------------------------------------------------------------------
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider as Provider } from '@mui/x-date-pickers/LocalizationProvider';
 
-type LocalizationContextValue = {
-  locale: SupportedLocale;
-  translations: TranslationKeys;
-  setLocale: (locale: SupportedLocale) => void;
-  t: (key: string) => string;
-};
-
-const LocalizationContext = createContext<LocalizationContextValue | undefined>(undefined);
+import { useTranslate } from './use-locales';
 
 // ----------------------------------------------------------------------
 
-type LocalizationProviderProps = {
+type Props = {
   children: React.ReactNode;
 };
 
-export function LocalizationProvider({ children }: LocalizationProviderProps) {
-  const [locale, setLocaleState] = useState<SupportedLocale>(() => {
-    const savedLocale = localStorage.getItem('locale') as SupportedLocale;
-    return savedLocale && translations[savedLocale] ? savedLocale : DEFAULT_LOCALE;
-  });
+export function LocalizationProvider({ children }: Props) {
+  const { currentLang } = useTranslate();
 
-  const setLocale = useCallback((newLocale: SupportedLocale) => {
-    setLocaleState(newLocale);
-    localStorage.setItem('locale', newLocale);
-  }, []);
-
-  const currentTranslations = useMemo(() => translations[locale], [locale]);
-
-  const t = useCallback(
-    (key: string): string => {
-      const keys = key.split('.');
-      const value = keys.reduce<any>(
-        (acc, k) => (acc && typeof acc === 'object' && k in acc ? acc[k] : undefined),
-        currentTranslations
-      );
-
-      return typeof value === 'string' ? value : key;
-    },
-    [currentTranslations]
-  );
-
-  const memoizedValue = useMemo(
-    () => ({
-      locale,
-      translations: currentTranslations,
-      setLocale,
-      t,
-    }),
-    [locale, currentTranslations, setLocale, t]
-  );
+  dayjs.locale(currentLang.adapterLocale);
 
   return (
-    <LocalizationContext.Provider value={memoizedValue}>{children}</LocalizationContext.Provider>
+    <Provider dateAdapter={AdapterDayjs} adapterLocale={currentLang.adapterLocale}>
+      {children}
+    </Provider>
   );
-}
-
-// ----------------------------------------------------------------------
-
-export function useLocalization() {
-  const context = useContext(LocalizationContext);
-
-  if (!context) {
-    throw new Error('useLocalization must be used within LocalizationProvider');
-  }
-
-  return context;
 }
