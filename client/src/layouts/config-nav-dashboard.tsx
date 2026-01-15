@@ -58,7 +58,7 @@ export const navData = [
     items: [
       {
         title: 'Settings',
-        path: paths.settings.organizations,
+        path: paths.settings.self,
         icon: ICONS.parameter,
         children: [
           { title: 'Organizations', path: paths.settings.organizations },

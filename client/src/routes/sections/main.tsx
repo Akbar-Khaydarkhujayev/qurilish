@@ -26,6 +26,16 @@ const ConstructionStatusesPage = lazy(
 );
 const ConstructionItemsPage = lazy(() => import('src/pages/dashboard/settings/construction-items'));
 
+// Building detail pages
+const BuildingDetailLayout = lazy(() => import('src/pages/dashboard/buildings/index'));
+const BuildingDetailsPage = lazy(() => import('src/pages/dashboard/buildings/details'));
+const BuildingContractsPage = lazy(() => import('src/pages/dashboard/buildings/contracts'));
+const BuildingSubObjectsPage = lazy(() => import('src/pages/dashboard/buildings/sub-object-cards'));
+const BuildingEstimatesPage = lazy(() => import('src/pages/dashboard/buildings/estimates'));
+const BuildingExpensesPage = lazy(() => import('src/pages/dashboard/buildings/bank-expenses'));
+const BuildingInvoicesPage = lazy(() => import('src/pages/dashboard/buildings/invoices'));
+const BuildingFilesPage = lazy(() => import('src/pages/dashboard/buildings/files'));
+
 // ----------------------------------------------------------------------
 
 const layoutContent = (
@@ -51,6 +61,19 @@ export const mainRoutes = [
     children: [
       { path: 'dashboard', element: <IndexPage /> }, // URL: /dashboard
       { path: 'buildings', element: <BuildingsPage /> }, // URL: /buildings
+      {
+        path: 'buildings/:id',
+        element: <BuildingDetailLayout />,
+        children: [
+          { index: true, element: <BuildingDetailsPage /> },
+          { path: 'contracts', element: <BuildingContractsPage /> },
+          { path: 'sub-object-cards', element: <BuildingSubObjectsPage /> },
+          { path: 'estimates', element: <BuildingEstimatesPage /> },
+          { path: 'bank-expenses', element: <BuildingExpensesPage /> },
+          { path: 'invoices', element: <BuildingInvoicesPage /> },
+          { path: 'files', element: <BuildingFilesPage /> },
+        ],
+      },
       {
         path: 'settings', // URL starts with /settings
         children: [

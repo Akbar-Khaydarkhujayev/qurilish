@@ -126,9 +126,14 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
     }
 
     const result = await pool.query(
-      `SELECT * FROM bank_expenses
-       WHERE object_card_id = $1 AND is_deleted = FALSE
-       ORDER BY registry_date DESC NULLS LAST`,
+      `SELECT
+        bank_expenses.*,
+        object_contract.contract_number,
+        object_contract.contract_date
+       FROM bank_expenses
+       LEFT JOIN object_contract ON bank_expenses.object_contract_id = object_contract.id
+       WHERE bank_expenses.object_card_id = $1 AND bank_expenses.is_deleted = FALSE
+       ORDER BY bank_expenses.registry_date DESC NULLS LAST`,
       [objectCardId]
     );
 

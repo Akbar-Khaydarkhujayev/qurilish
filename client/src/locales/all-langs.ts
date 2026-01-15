@@ -23,7 +23,7 @@ export const allLangs = [
     label: 'Uzbek (Latin)',
     countryCode: 'UZ',
     adapterLocale: 'uz-latn',
-    numberFormat: { code: 'uz-Latn-UZ', currency: 'UZS' },
+    numberFormat: { code: 'ru-RU', currency: 'UZS' },
     systemValue: {
       components: { ...enUSDate.components, ...enUSDataGrid.components },
     },
@@ -33,7 +33,7 @@ export const allLangs = [
     label: 'Uzbek (Cyrillic)',
     countryCode: 'UZ',
     adapterLocale: 'uz-cyrl',
-    numberFormat: { code: 'uz-Cyrl-UZ', currency: 'UZS' },
+    numberFormat: { code: 'ru-RU', currency: 'UZS' },
     systemValue: {
       components: { ...enUSDate.components, ...enUSDataGrid.components },
     },

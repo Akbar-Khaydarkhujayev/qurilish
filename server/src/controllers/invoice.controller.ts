@@ -126,9 +126,14 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
     }
 
     const result = await pool.query(
-      `SELECT * FROM invoices
-       WHERE object_card_id = $1 AND is_deleted = FALSE
-       ORDER BY document_date DESC NULLS LAST`,
+      `SELECT
+        invoices.*,
+        object_contract.contract_number,
+        object_contract.contract_date
+       FROM invoices
+       LEFT JOIN object_contract ON invoices.object_contract_id = object_contract.id
+       WHERE invoices.object_card_id = $1 AND invoices.is_deleted = FALSE
+       ORDER BY invoices.document_date DESC NULLS LAST`,
       [objectCardId]
     );
 

@@ -21,6 +21,7 @@ export const paths = {
   },
   buildings: ROOTS.BUILDINGS,
   settings: {
+    self: ROOTS.SETTINGS,
     organizations: `${ROOTS.SETTINGS}/organizations`,
     users: `${ROOTS.SETTINGS}/users`,
     regions: `${ROOTS.SETTINGS}/regions`,

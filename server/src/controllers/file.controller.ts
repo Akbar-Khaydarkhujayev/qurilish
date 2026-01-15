@@ -1,8 +1,16 @@
+import path from 'path';
+import fs from 'fs';
 import { Response } from 'express';
 import pool from '../config/database';
 import { AuthRequest } from '../types';
 import * as responseFormatter from '../utils/responseFormatter';
 import { parsePagination, buildOrderClause, calculateMeta, buildSearchClause } from '../utils/queryBuilder';
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '../../uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 export const getAll = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -112,10 +120,16 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
 
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { object_card_id, path, file_name } = req.body;
+    const { object_card_id } = req.body;
+    const file = req.file;
 
-    if (!object_card_id || !path || !file_name) {
-      responseFormatter.badRequest(res, 'Object card ID, path, and file name are required');
+    if (!object_card_id) {
+      responseFormatter.badRequest(res, 'Object card ID is required');
+      return;
+    }
+
+    if (!file) {
+      responseFormatter.badRequest(res, 'File is required');
       return;
     }
 
@@ -130,16 +144,19 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
+    const filePath = `/uploads/${file.filename}`;
+    const fileName = file.originalname;
+
     const result = await pool.query(
       `INSERT INTO files (object_card_id, path, file_name)
        VALUES ($1, $2, $3) RETURNING *`,
-      [object_card_id, path, file_name]
+      [object_card_id, filePath, fileName]
     );
 
-    responseFormatter.created(res, result.rows[0], 'File created successfully');
+    responseFormatter.created(res, result.rows[0], 'File uploaded successfully');
   } catch (error) {
     console.error('Create file error:', error);
-    responseFormatter.error(res, 'Error creating file');
+    responseFormatter.error(res, 'Error uploading file');
   }
 };
 
@@ -208,5 +225,31 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
   }
 };
 
-// Note: Actual file upload/download functionality will be added later with multer
-// This controller currently handles file metadata only
+export const download = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      'SELECT * FROM files WHERE id = $1 AND is_deleted = FALSE',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      responseFormatter.notFound(res, 'File not found');
+      return;
+    }
+
+    const file = result.rows[0];
+    const filePath = path.join(__dirname, '../..', file.path);
+
+    if (!fs.existsSync(filePath)) {
+      responseFormatter.notFound(res, 'File not found on disk');
+      return;
+    }
+
+    res.download(filePath, file.file_name);
+  } catch (error) {
+    console.error('Download file error:', error);
+    responseFormatter.error(res, 'Error downloading file');
+  }
+};
