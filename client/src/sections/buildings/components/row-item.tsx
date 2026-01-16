@@ -26,7 +26,7 @@ export const BuildingRowItem = ({ row, remove, edit, click }: RowItemProps<IBuil
       </TableCell>
       <TableCell>{dayjs(row.created_at).format('DD.MM.YYYY') || '-'}</TableCell>
 
-      <TableCell align="right">
+      <TableCell align="right" onClick={(e) => e.stopPropagation()}>
         <Box display="flex" justifyContent="end">
           {edit && (
             <Tooltip title={t('Edit')}>

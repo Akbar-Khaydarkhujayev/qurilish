@@ -24,8 +24,8 @@ import { NavVertical } from './nav-vertical';
 import { NavHorizontal } from './nav-horizontal';
 import { _account } from '../config-nav-account';
 import { HeaderBase } from '../core/header-base';
+import { useNavData } from '../config-nav-dashboard';
 import { LayoutSection } from '../core/layout-section';
-import { navData as dashboardNavData } from '../config-nav-dashboard';
 
 // ----------------------------------------------------------------------
 
@@ -48,6 +48,7 @@ export function DashboardLayout({ sx, children, data }: DashboardLayoutProps) {
 
   const layoutQuery: Breakpoint = 'lg';
 
+  const dashboardNavData = useNavData();
   const navData = data?.nav ?? dashboardNavData;
 
   const isNavMini = settings.navLayout === 'mini';

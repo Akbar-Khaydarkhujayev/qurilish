@@ -6,6 +6,12 @@ import { parsePagination, buildOrderClause, calculateMeta, buildSearchClause } f
 
 export const getAll = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const currentUser = req.user;
+    if (!currentUser) {
+      responseFormatter.unauthorized(res);
+      return;
+    }
+
     const { page, limit, offset } = parsePagination(req.query);
     const { sort_by, sort_order, search, region_id, district_id, construction_status_id, contractor_id } = req.query;
 
@@ -14,6 +20,14 @@ export const getAll = async (req: AuthRequest, res: Response): Promise<void> => 
 
     let whereClause = 'WHERE object_card.is_deleted = FALSE';
     const params: any[] = [];
+
+    // Role-based filtering:
+    // super_admin: can see all buildings
+    // region_admin and user: can see only buildings with same organization_id
+    if (currentUser.role !== 'super_admin') {
+      whereClause += ` AND object_card.organization_id = $${params.length + 1}`;
+      params.push(currentUser.organization_id);
+    }
 
     // Apply filters
     if (region_id) {
@@ -297,6 +311,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       construction_status_id,
       construction_cost,
       organization_id,
+      building_type,
     } = req.body;
 
     // Validate required fields
@@ -372,8 +387,8 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       `INSERT INTO object_card (
         card_number, object_name, address, region_id, district_id, construction_basis,
         project_organization_id, object_passport, contractor_id, technical_supervisor_id,
-        construction_start_date, construction_end_date, construction_status_id, construction_cost, organization_id
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+        construction_start_date, construction_end_date, construction_status_id, construction_cost, organization_id, building_type
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING *`,
       [
         card_number || null,
@@ -391,6 +406,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
         construction_status_id,
         construction_cost || null,
         organization_id,
+        building_type || 'new_building',
       ]
     );
 
@@ -420,6 +436,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
       construction_status_id,
       construction_cost,
       organization_id,
+      building_type,
     } = req.body;
 
     // Validate required fields
@@ -491,8 +508,8 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
         card_number = $1, object_name = $2, address = $3, region_id = $4, district_id = $5,
         construction_basis = $6, project_organization_id = $7, object_passport = $8,
         contractor_id = $9, technical_supervisor_id = $10, construction_start_date = $11,
-        construction_end_date = $12, construction_status_id = $13, construction_cost = $14, organization_id = $15
-       WHERE id = $16 AND is_deleted = FALSE
+        construction_end_date = $12, construction_status_id = $13, construction_cost = $14, organization_id = $15, building_type = $16
+       WHERE id = $17 AND is_deleted = FALSE
        RETURNING *`,
       [
         card_number || null,
@@ -510,6 +527,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
         construction_status_id,
         construction_cost || null,
         organization_id,
+        building_type || 'new_building',
         id,
       ]
     );

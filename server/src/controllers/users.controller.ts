@@ -8,6 +8,12 @@ import { canCreateUser } from '../middleware/auth';
 
 export const getAll = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const currentUser = req.user;
+    if (!currentUser) {
+      responseFormatter.unauthorized(res);
+      return;
+    }
+
     const { page, limit, offset } = parsePagination(req.query);
     const { sort_by, sort_order, search } = req.query;
 
@@ -16,6 +22,19 @@ export const getAll = async (req: AuthRequest, res: Response): Promise<void> => 
 
     let whereClause = 'WHERE u.is_deleted = FALSE';
     const params: any[] = [];
+
+    // Role-based filtering:
+    // super_admin: can see all users
+    // region_admin: can see only region_admin and user roles with same organization_id
+    // user: can see only users with same organization_id
+    if (currentUser.role === 'region_admin') {
+      whereClause += ` AND u.role IN ('region_admin', 'user') AND u.organization_id = $${params.length + 1}`;
+      params.push(currentUser.organization_id);
+    } else if (currentUser.role === 'user') {
+      whereClause += ` AND u.role = 'user' AND u.organization_id = $${params.length + 1}`;
+      params.push(currentUser.organization_id);
+    }
+    // super_admin sees all users (no additional filter)
 
     if (searchClause.clause) {
       whereClause += ` AND ${searchClause.clause}`;

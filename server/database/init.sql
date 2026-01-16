@@ -134,9 +134,11 @@ CREATE TABLE object_card (
     construction_status_id INTEGER NOT NULL REFERENCES construction_status(id) ON DELETE RESTRICT,
     construction_cost NUMERIC(15, 2),
     organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE RESTRICT,
+    building_type VARCHAR(50) DEFAULT 'new_building',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_deleted BOOLEAN DEFAULT FALSE
+    is_deleted BOOLEAN DEFAULT FALSE,
+    CONSTRAINT check_building_type CHECK (building_type IN ('new_building', 'major_renovation'))
 );
 
 -- Create object_contract table (obyekt_shartnomasi)

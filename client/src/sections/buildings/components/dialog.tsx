@@ -11,7 +11,7 @@ import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
-import { formSchema } from '../api/schema';
+import { formSchema, BUILDING_TYPE_OPTIONS } from '../api/schema';
 import { useEditBuilding } from '../api/edit';
 import { useCreateBuilding } from '../api/create';
 import { useGetBuildingById } from '../api/get-by-id';
@@ -41,6 +41,7 @@ const defaultValues: FormFields = {
   construction_status_id: undefined as unknown as number,
   construction_cost: '',
   organization_id: undefined as unknown as number,
+  building_type: 'new_building',
 };
 
 interface IProps {
@@ -96,6 +97,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         construction_status_id: building.data.construction_status_id,
         construction_cost: building.data.construction_cost || '',
         organization_id: building.data.organization_id,
+        building_type: building.data.building_type || 'new_building',
       });
     } else {
       methods.reset(defaultValues);
@@ -132,6 +134,14 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
           <Box pt={1} display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2}>
             <Field.Text size="small" name="card_number" label={t('Card Number')} />
             <Field.Text required size="small" name="object_name" label={t('Object Name')} />
+
+            <Field.Select required size="small" name="building_type" label={t('Building Type')}>
+              {BUILDING_TYPE_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {t(option.label)}
+                </MenuItem>
+              ))}
+            </Field.Select>
 
             <Field.Text size="small" name="address" label={t('Address')} />
             <Field.Text size="small" name="construction_basis" label={t('Construction Basis')} />
