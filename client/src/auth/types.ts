@@ -6,10 +6,8 @@ export type UserType = {
   name: string;
   username: string;
   email?: string;
-  firstName?: string;
-  lastName?: string;
-  organizationId: number;
-  regionId?: number;
+  organization_id: number;
+  region_id?: number;
   role: UserRole;
   userType?: string;
   accessToken?: string;

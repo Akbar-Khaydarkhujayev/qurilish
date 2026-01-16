@@ -111,16 +111,14 @@ export const UserDialog = ({ open, onClose, editedUserId }: IProps) => {
               disabled={!!editedUserId}
             />
 
-            {!editedUserId && (
-              <Field.Text
-                required
-                size="small"
-                sx={{ mb: 2 }}
-                name="password"
-                label={t('Password')}
-                type="password"
-              />
-            )}
+            <Field.Text
+              required
+              size="small"
+              sx={{ mb: 2 }}
+              name="password"
+              label={t('Password')}
+              type="password"
+            />
 
             <Field.Select
               required

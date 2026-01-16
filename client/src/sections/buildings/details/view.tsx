@@ -33,7 +33,7 @@ const defaultValues: FormFields = {
   district_id: undefined as unknown as number,
   construction_basis: '',
   project_organization_id: undefined as unknown as number,
-  object_passport: '',
+  // object_passport: '',
   contractor_id: undefined as unknown as number,
   technical_supervisor_id: null,
   construction_start_date: null,
@@ -81,7 +81,7 @@ export default function DetailsView() {
         district_id: building.data.district_id,
         construction_basis: building.data.construction_basis || '',
         project_organization_id: building.data.project_organization_id,
-        object_passport: building.data.object_passport || '',
+        // object_passport: building.data.object_passport || '',
         contractor_id: building.data.contractor_id,
         technical_supervisor_id: building.data.technical_supervisor_id,
         construction_start_date: building.data.construction_start_date?.split('T')[0] || null,
@@ -227,14 +227,14 @@ export default function DetailsView() {
               </Field.Select>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* <Grid item xs={12} md={6}>
               <Field.Text
                 size="small"
                 name="object_passport"
                 label={t('Object Passport')}
                 fullWidth
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={6}>
               <Field.Text
                 size="small"

@@ -16,7 +16,7 @@ export const formSchema = z.object({
   district_id: z.number({ required_error: 'Required' }),
   construction_basis: z.string().optional(),
   project_organization_id: z.number({ required_error: 'Required' }),
-  object_passport: z.string().optional(),
+  // object_passport: z.string().optional(),
   contractor_id: z.number({ required_error: 'Required' }),
   technical_supervisor_id: z.number().optional().nullable(),
   construction_start_date: z.string().optional().nullable(),

@@ -33,7 +33,7 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         open={popover.open}
         onClick={popover.onOpen}
         photoURL=""
-        displayName={`${user?.firstName} ${user?.lastName}`}
+        displayName={user?.name || ''}
         sx={sx}
         {...other}
       />

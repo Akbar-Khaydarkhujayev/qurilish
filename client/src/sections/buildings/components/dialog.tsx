@@ -11,6 +11,8 @@ import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
+import { useAuthContext } from 'src/auth/hooks';
+
 import { useEditBuilding } from '../api/edit';
 import { useCreateBuilding } from '../api/create';
 import { useGetBuildingById } from '../api/get-by-id';
@@ -33,7 +35,7 @@ const defaultValues: FormFields = {
   district_id: undefined as unknown as number,
   construction_basis: '',
   project_organization_id: undefined as unknown as number,
-  object_passport: '',
+  // object_passport: '',
   contractor_id: undefined as unknown as number,
   technical_supervisor_id: null,
   construction_start_date: null,
@@ -52,6 +54,7 @@ interface IProps {
 
 export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
   const { t } = useTranslate();
+  const { user } = useAuthContext();
 
   const { data: building } = useGetBuildingById(editedBuildingId);
   const { data: regionsData } = useGetRegions({ page: 1, limit: 100 });
@@ -67,7 +70,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
     resolver: zodResolver(formSchema),
     defaultValues,
   });
-  console.log(methods.watch('region_id'));
+  console.log(user);
   const selectedRegionId = methods.watch('region_id');
 
   const { data: districtsData } = useGetDistricts({
@@ -89,20 +92,20 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         district_id: building.data.district_id,
         construction_basis: building.data.construction_basis || '',
         project_organization_id: building.data.project_organization_id,
-        object_passport: building.data.object_passport || '',
+        // object_passport: building.data.object_passport || '',
         contractor_id: building.data.contractor_id,
         technical_supervisor_id: building.data.technical_supervisor_id,
         construction_start_date: building.data.construction_start_date?.split('T')[0] || null,
         construction_end_date: building.data.construction_end_date?.split('T')[0] || null,
         construction_status_id: building.data.construction_status_id,
         construction_cost: building.data.construction_cost || '',
-        organization_id: building.data.organization_id,
+        organization_id: building.data.organization_id || user?.organization_id,
         building_type: building.data.building_type || 'new_building',
       });
     } else {
       methods.reset(defaultValues);
     }
-  }, [building, methods, open, editedBuildingId]);
+  }, [building, methods, open, editedBuildingId, user]);
 
   // Reset district when region changes
   useEffect(() => {
@@ -170,6 +173,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
 
             <Field.Select
               required
+              disabled
               size="small"
               name="project_organization_id"
               label={t('Project Organization')}
@@ -210,7 +214,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
               ))}
             </Field.Select>
 
-            <Field.Text size="small" name="object_passport" label={t('Object Passport')} />
+            {/* <Field.Text size="small" name="object_passport" label={t('Object Passport')} /> */}
             <Field.Text
               size="small"
               name="construction_cost"
