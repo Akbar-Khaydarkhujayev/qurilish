@@ -46,6 +46,20 @@ INSERT INTO districts (name, region_id) VALUES
     ('Yuqorichirchiq tumani', 2),
     ('Zangiota tumani', 2);
 
+-- Insert districts for Sirdaryo viloyati
+INSERT INTO districts (name, region_id) VALUES
+    ('Guliston shahri', 13),
+    ('Yangiyer shahri', 13),
+    ('Shirin shahri', 13),
+    ('Boyovut tumani', 13),
+    ('Guliston tumani', 13),
+    ('Mirzaobod tumani', 13),
+    ('Oqoltin tumani', 13),
+    ('Sardoba tumani', 13),
+    ('Sayxunobod tumani', 13),
+    ('Sirdaryo tumani', 13),
+    ('Xovos tumani', 13);
+
 -- Insert sample organization
 INSERT INTO organizations (name, tax_id, region_id) VALUES
     ('Davlat qurilish nazorati', '123456789', 1),
