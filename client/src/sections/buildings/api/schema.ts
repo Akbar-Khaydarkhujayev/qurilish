@@ -22,7 +22,7 @@ export const formSchema = z.object({
   construction_start_date: z.string().optional().nullable(),
   construction_end_date: z.string().optional().nullable(),
   construction_status_id: z.number({ required_error: 'Required' }),
-  construction_cost: z.string().optional(),
+  construction_cost: z.coerce.string().optional(),
   organization_id: z.number({ required_error: 'Required' }),
   building_type: z.enum(['new_building', 'major_renovation']).default('new_building'),
 });

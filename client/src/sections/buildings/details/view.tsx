@@ -41,6 +41,7 @@ const defaultValues: FormFields = {
   construction_status_id: undefined as unknown as number,
   construction_cost: '',
   organization_id: undefined as unknown as number,
+  building_type: 'new_building',
 };
 
 export default function DetailsView() {
@@ -88,6 +89,7 @@ export default function DetailsView() {
         construction_status_id: building.data.construction_status_id,
         construction_cost: building.data.construction_cost || '',
         organization_id: building.data.organization_id,
+        building_type: building?.data?.building_type || 'new_building',
       });
     }
   }, [building, methods]);

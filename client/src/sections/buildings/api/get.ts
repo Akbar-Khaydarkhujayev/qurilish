@@ -28,6 +28,7 @@ export interface IBuilding {
   status_name: string;
   construction_cost: string | null;
   organization_id: number;
+  building_type: 'new_building' | 'major_renovation';
   created_at: string;
   updated_at: string;
 }

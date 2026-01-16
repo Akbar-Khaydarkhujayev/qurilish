@@ -11,11 +11,11 @@ import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
-import { formSchema, BUILDING_TYPE_OPTIONS } from '../api/schema';
 import { useEditBuilding } from '../api/edit';
 import { useCreateBuilding } from '../api/create';
 import { useGetBuildingById } from '../api/get-by-id';
 import { useGetRegions } from '../../settings/regions/api/get';
+import { formSchema, BUILDING_TYPE_OPTIONS } from '../api/schema';
 import { useGetDistricts } from '../../settings/districts/api/get';
 import { useGetContractors } from '../../settings/contractors/api/get';
 import { useGetOrganizations } from '../../settings/organizations/api/get';
