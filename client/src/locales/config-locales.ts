@@ -1,9 +1,9 @@
 // ----------------------------------------------------------------------
 
-export type LanguageValue = 'ru' | 'uz-latn' | 'uz-cyrl';
+export type LanguageValue = 'ru' | 'uzlatn' | 'uzcyrl';
 
 export const fallbackLng = 'ru';
-export const languages = ['ru', 'uz-latn', 'uz-cyrl'];
+export const languages = ['ru', 'uzlatn', 'uzcyrl'];
 export const defaultNS = 'common';
 export const cookieName = 'i18next';
 
@@ -32,12 +32,12 @@ export const changeLangMessages: Record<
     error: 'Ошибка при изменении языка!',
     loading: 'Загрузка...',
   },
-  'uz-latn': {
+  uzlatn: {
     success: "Til o'zgartirildi!",
     error: "Tilni o'zgartirishda xato!",
     loading: 'Yuklanmoqda...',
   },
-  'uz-cyrl': {
+  uzcyrl: {
     success: 'Тил ўзгартирилди!',
     error: 'Тилни ўзгартиришда хато!',
     loading: 'Юкланмоқда...',

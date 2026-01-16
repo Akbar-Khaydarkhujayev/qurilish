@@ -19,20 +19,20 @@ export const allLangs = [
     },
   },
   {
-    value: 'uz-latn',
+    value: 'uzlatn',
     label: 'Uzbek',
     countryCode: 'UZ',
-    adapterLocale: 'uz-latn',
+    adapterLocale: 'uzlatn',
     numberFormat: { code: 'ru-RU', currency: 'UZS' },
     systemValue: {
       components: { ...enUSDate.components, ...enUSDataGrid.components },
     },
   },
   {
-    value: 'uz-cyrl',
+    value: 'uzcyrl',
     label: 'Узбек',
     countryCode: 'UZ',
-    adapterLocale: 'uz-cyrl',
+    adapterLocale: 'uzcyrl',
     numberFormat: { code: 'ru-RU', currency: 'UZS' },
     systemValue: {
       components: { ...enUSDate.components, ...enUSDataGrid.components },
