@@ -4,6 +4,8 @@ import { usePathname } from 'src/routes/hooks';
 import { isExternalLink } from 'src/routes/utils';
 import { useActiveLink } from 'src/routes/hooks/use-active-link';
 
+import { useTranslate } from 'src/locales';
+
 import { NavItem } from './nav-item';
 import { navSectionClasses } from '../classes';
 import { NavUl, NavLi, NavCollapse } from '../styles';
@@ -14,6 +16,7 @@ import type { NavListProps, NavSubListProps } from '../types';
 
 export function NavList({ data, render, depth, slotProps, enabledRootRedirect }: NavListProps) {
   const pathname = usePathname();
+  const { t } = useTranslate();
 
   const active = useActiveLink(data.path, !!data.children);
 
@@ -43,8 +46,8 @@ export function NavList({ data, render, depth, slotProps, enabledRootRedirect }:
       path={data.path}
       icon={data.icon}
       info={data.info}
-      title={data.title}
-      caption={data.caption}
+      title={t(data.title)}
+      caption={data.caption ? t(data.caption) : undefined}
       // state
       depth={depth}
       active={active}

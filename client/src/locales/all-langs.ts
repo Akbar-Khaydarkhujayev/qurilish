@@ -20,7 +20,7 @@ export const allLangs = [
   },
   {
     value: 'uz-latn',
-    label: 'Uzbek (Latin)',
+    label: 'Uzbek',
     countryCode: 'UZ',
     adapterLocale: 'uz-latn',
     numberFormat: { code: 'ru-RU', currency: 'UZS' },
@@ -30,7 +30,7 @@ export const allLangs = [
   },
   {
     value: 'uz-cyrl',
-    label: 'Uzbek (Cyrillic)',
+    label: 'Узбек',
     countryCode: 'UZ',
     adapterLocale: 'uz-cyrl',
     numberFormat: { code: 'ru-RU', currency: 'UZS' },

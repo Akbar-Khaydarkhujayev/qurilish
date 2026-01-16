@@ -11,6 +11,8 @@ import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
+import { useAuthContext } from 'src/auth/hooks';
+
 import { useEditUser } from '../api/edit';
 import { formSchema } from '../api/schema';
 import { useCreateUser } from '../api/create';
@@ -20,16 +22,18 @@ import { useGetOrganizations } from '../../organizations/api/get';
 import type { UserRole } from '../api/get';
 import type { FormFields } from '../api/schema';
 
-const defaultValues: FormFields = {
-  id: undefined,
-  name: '',
-  username: '',
-  password: '',
-  organization_id: undefined as unknown as number,
-  role: 'user',
+// Get allowed roles based on current user's role
+// super_admin can only create/edit region_admin
+// region_admin can only create/edit user
+const getAllowedRoles = (currentUserRole?: string): UserRole[] => {
+  if (currentUserRole === 'super_admin') {
+    return ['region_admin'];
+  }
+  if (currentUserRole === 'region_admin') {
+    return ['user'];
+  }
+  return [];
 };
-
-const ROLES: UserRole[] = ['super_admin', 'region_admin', 'user'];
 
 interface IProps {
   open: boolean;
@@ -39,11 +43,24 @@ interface IProps {
 
 export const UserDialog = ({ open, onClose, editedUserId }: IProps) => {
   const { t } = useTranslate();
+  const { user: currentUser } = useAuthContext();
 
   const { data: user } = useGetUserById(editedUserId);
   const { data: organizationsData } = useGetOrganizations({ page: 1, limit: 100 });
   const { mutate: edit } = useEditUser();
   const { mutate: create } = useCreateUser();
+
+  const allowedRoles = getAllowedRoles(currentUser?.role);
+  const defaultRole = allowedRoles[0] || 'user';
+
+  const defaultValues: FormFields = {
+    id: undefined,
+    name: '',
+    username: '',
+    password: '',
+    organization_id: undefined as unknown as number,
+    role: defaultRole,
+  };
 
   const methods = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -59,9 +76,9 @@ export const UserDialog = ({ open, onClose, editedUserId }: IProps) => {
       username: user?.data.username || '',
       password: '',
       organization_id: user?.data.organization_id || undefined,
-      role: user?.data.role || 'user',
+      role: user?.data.role || defaultRole,
     });
-  }, [user, methods, open, editedUserId]);
+  }, [user, methods, open, editedUserId, defaultRole]);
 
   const onSubmit = methods.handleSubmit(
     async (data) => {
@@ -120,7 +137,7 @@ export const UserDialog = ({ open, onClose, editedUserId }: IProps) => {
             </Field.Select>
 
             <Field.Select required size="small" sx={{ mb: 2 }} name="role" label={t('Role')}>
-              {ROLES.map((role) => (
+              {allowedRoles.map((role) => (
                 <MenuItem key={role} value={role}>
                   {t(role)}
                 </MenuItem>

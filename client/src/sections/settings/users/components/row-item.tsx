@@ -1,5 +1,3 @@
-import type { RowItemProps } from 'src/types/global';
-
 import dayjs from 'dayjs';
 
 import { Box, Tooltip, TableRow, TableCell, IconButton } from '@mui/material';
@@ -23,8 +21,35 @@ const getRoleColor = (role: string) => {
   }
 };
 
-export const UserRowItem = ({ row, remove, edit }: RowItemProps<IUser>) => {
+// Check if currentUser can manage targetUser based on role hierarchy
+// super_admin can only manage region_admin
+// region_admin can only manage user
+// user cannot manage anyone
+const canManageUser = (currentUserRole?: string, targetUserRole?: string): boolean => {
+  if (!currentUserRole || !targetUserRole) return false;
+
+  if (currentUserRole === 'super_admin' && targetUserRole === 'region_admin') {
+    return true;
+  }
+
+  if (currentUserRole === 'region_admin' && targetUserRole === 'user') {
+    return true;
+  }
+
+  return false;
+};
+
+interface UserRowItemProps {
+  row: IUser;
+  currentUserRole?: string;
+  edit?: () => void;
+  remove?: () => void;
+}
+
+export const UserRowItem = ({ row, currentUserRole, remove, edit }: UserRowItemProps) => {
   const { t } = useTranslate();
+
+  const canManage = canManageUser(currentUserRole, row.role);
 
   return (
     <TableRow hover>
@@ -38,14 +63,14 @@ export const UserRowItem = ({ row, remove, edit }: RowItemProps<IUser>) => {
 
       <TableCell align="right">
         <Box display="flex" justifyContent="end">
-          {edit && (
+          {edit && canManage && (
             <Tooltip title={t('Edit')}>
               <IconButton onClick={edit}>
                 <Iconify icon="solar:pen-bold" />
               </IconButton>
             </Tooltip>
           )}
-          {remove && (
+          {remove && canManage && (
             <CustomConfirmDialog
               onConfirm={remove}
               title={t('Delete')}

@@ -9,6 +9,7 @@ import { isExternalLink } from 'src/routes/utils';
 import { useActiveLink } from 'src/routes/hooks/use-active-link';
 
 import { paper } from 'src/theme/styles';
+import { useTranslate } from 'src/locales';
 
 import { NavItem } from './nav-item';
 import { NavUl, NavLi } from '../styles';
@@ -26,6 +27,7 @@ export function NavList({
   slotProps,
   enabledRootRedirect,
 }: NavListProps) {
+  const { t } = useTranslate();
   const theme = useTheme();
 
   const pathname = usePathname();
@@ -58,11 +60,11 @@ export function NavList({
       ref={navItemRef}
       render={render}
       // slots
-      title={data.title}
+      title={t(data.title)}
       path={data.path}
       icon={data.icon}
       info={data.info}
-      caption={data.caption}
+      caption={data.caption ? t(data.caption) : undefined}
       // state
       depth={depth}
       active={active}

@@ -4,6 +4,8 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import TextField from '@mui/material/TextField';
 
+import { useTranslate } from 'src/locales';
+
 // ----------------------------------------------------------------------
 
 type Props = TextFieldProps & {
@@ -11,6 +13,7 @@ type Props = TextFieldProps & {
 };
 
 export function RHFTextField({ name, helperText, type, ...other }: Props) {
+  const { t } = useTranslate();
   const { control } = useFormContext();
 
   return (
@@ -31,7 +34,7 @@ export function RHFTextField({ name, helperText, type, ...other }: Props) {
             }
           }}
           error={!!error}
-          helperText={error?.message ?? helperText}
+          helperText={error?.message ? t(error?.message) : helperText}
           inputProps={{
             autoComplete: 'off',
           }}

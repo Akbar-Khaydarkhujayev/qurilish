@@ -19,6 +19,7 @@ import { isExternalLink } from 'src/routes/utils';
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useEventListener } from 'src/hooks/use-event-listener';
 
+import { useTranslate } from 'src/locales';
 import { varAlpha } from 'src/theme/styles';
 
 import { Label } from 'src/components/label';
@@ -36,6 +37,7 @@ export type SearchbarProps = BoxProps & {
 };
 
 export function Searchbar({ data: navItems = [], sx, ...other }: SearchbarProps) {
+  const { t } = useTranslate();
   const theme = useTheme();
 
   const router = useRouter();
@@ -166,7 +168,7 @@ export function Searchbar({ data: navItems = [], sx, ...other }: SearchbarProps)
           <InputBase
             fullWidth
             autoFocus
-            placeholder="Search..."
+            placeholder={t('Search...')}
             value={searchQuery}
             onChange={handleSearch}
             startAdornment={

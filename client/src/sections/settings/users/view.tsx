@@ -16,6 +16,8 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { SearchInput } from 'src/components/search-input';
 import { TableNoData, TableHeadCustom, TablePaginationCustom } from 'src/components/table';
 
+import { useAuthContext } from 'src/auth/hooks';
+
 import { useGetUsers } from './api/get';
 import { useDeleteUser } from './api/delete';
 import { UserDialog } from './components/dialog';
@@ -25,12 +27,11 @@ const headLabels = ['Name', 'Username', 'Organization', 'Role', 'Created at', ''
 
 export default function UsersView() {
   const { t } = useTranslate();
+  const { user } = useAuthContext();
   const { page, limit } = usePagination();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [editedUserId, setEditedUserId] = useState<string | undefined>(
-    undefined
-  );
+  const [editedUserId, setEditedUserId] = useState<string | undefined>(undefined);
 
   const search = useDebounce(searchQuery);
   const openEditDialog = useBoolean();
@@ -41,6 +42,12 @@ export default function UsersView() {
     limit,
     search,
   });
+
+  // Role-based permissions:
+  // super_admin can create/edit/delete region_admin
+  // region_admin can create/edit/delete user
+  // user cannot create/edit/delete anyone
+  const canCreateUser = user?.role === 'super_admin' || user?.role === 'region_admin';
 
   return (
     <>
@@ -61,17 +68,19 @@ export default function UsersView() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
 
-            <Button
-              variant="contained"
-              onClick={() => {
-                setEditedUserId(undefined);
-                openEditDialog.onTrue();
-              }}
-              startIcon={<Iconify icon="solar:add-circle-bold" />}
-              color="primary"
-            >
-              {t('add')}
-            </Button>
+            {canCreateUser && (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setEditedUserId(undefined);
+                  openEditDialog.onTrue();
+                }}
+                startIcon={<Iconify icon="solar:add-circle-bold" />}
+                color="primary"
+              >
+                {t('add')}
+              </Button>
+            )}
           </Box>
         </Box>
 
@@ -99,6 +108,7 @@ export default function UsersView() {
                   <UserRowItem
                     key={row.id}
                     row={row}
+                    currentUserRole={user?.role}
                     edit={() => {
                       setEditedUserId(String(row.id));
                       openEditDialog.onTrue();

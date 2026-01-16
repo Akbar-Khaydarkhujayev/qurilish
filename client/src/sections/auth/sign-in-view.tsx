@@ -14,6 +14,8 @@ import { useRouter } from 'src/routes/hooks';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
+import { useTranslate } from 'src/locales';
+
 import { Iconify } from 'src/components/iconify';
 import { AnimateLogo2 } from 'src/components/animate';
 import { Form, Field } from 'src/components/hook-form';
@@ -33,6 +35,7 @@ export const SignInSchema = zod.object({
 // ----------------------------------------------------------------------
 
 export function SignInView() {
+  const { t } = useTranslate();
   const password = useBoolean();
 
   const router = useRouter();
@@ -62,9 +65,10 @@ export function SignInView() {
       await checkUserSession?.();
 
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      setErrorMsg(error instanceof Error ? error.message : error);
+      const message = error?.message || error?.data?.message || 'Invalid username or password';
+      setErrorMsg(typeof message === 'string' ? message : 'Invalid username or password');
     }
   });
 
@@ -72,19 +76,19 @@ export function SignInView() {
 
   const renderHead = (
     <Stack alignItems="center" spacing={1.5} sx={{ mb: 5 }}>
-      <Typography variant="h5">Sign in to your account</Typography>
+      <Typography variant="h5">{t('Sign in to your account')}</Typography>
     </Stack>
   );
 
   const renderForm = (
     <Stack spacing={3}>
-      <Field.Text name="username" label="Username" InputLabelProps={{ shrink: true }} />
+      <Field.Text name="username" label={t('username')} InputLabelProps={{ shrink: true }} />
 
       <Stack spacing={1.5}>
         <Field.Text
           name="password"
-          label="Password"
-          placeholder="6+ characters"
+          label={t('password')}
+          placeholder={t('6+ characters')}
           type={password.value ? 'text' : 'password'}
           InputLabelProps={{ shrink: true }}
           InputProps={{
@@ -106,9 +110,9 @@ export function SignInView() {
         type="submit"
         variant="contained"
         loading={isSubmitting}
-        loadingIndicator="Sign in..."
+        loadingIndicator={`${t('Sign in')}...`}
       >
-        Sign in
+        {t('Sign in')}
       </LoadingButton>
     </Stack>
   );
@@ -121,7 +125,7 @@ export function SignInView() {
 
       {!!errorMsg && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {errorMsg}
+          {t(errorMsg)}
         </Alert>
       )}
 

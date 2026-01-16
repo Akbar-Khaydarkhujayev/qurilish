@@ -98,7 +98,7 @@ export const ProjectOrganizationDialog = ({
               rows={2}
             />
             <Field.Text size="small" sx={{ mb: 2 }} name="phone_number" label={t('Phone Number')} />
-            <Field.Text size="small" sx={{ mb: 2 }} name="mfo" label={t('MFO')} />
+            <Field.Text size="small" sx={{ mb: 2 }} name="mfo" label={t('mfo')} />
 
             <Box display="flex" justifyContent="flex-end" gap={1} mb={3}>
               <Button

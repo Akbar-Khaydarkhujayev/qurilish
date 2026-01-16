@@ -188,7 +188,7 @@ export default function BuildingsView() {
               <TableHeadCustom
                 headLabel={headLabels.map((label) => ({
                   id: label,
-                  label: t(label),
+                  label,
                   align: label === '' ? 'right' : 'left',
                 }))}
               />

@@ -12,6 +12,7 @@ import ButtonBase from '@mui/material/ButtonBase';
 import ListItemText from '@mui/material/ListItemText';
 import InputAdornment from '@mui/material/InputAdornment';
 
+import { useTranslate } from 'src/locales';
 import { countries } from 'src/assets/data/countries';
 
 import { Iconify, FlagIcon } from 'src/components/iconify';
@@ -25,6 +26,7 @@ import type { CountryListProps } from './types';
 // ----------------------------------------------------------------------
 
 export function CountryListPopover({ countryCode, onClickCountry }: CountryListProps) {
+  const { t } = useTranslate();
   const popover = usePopover();
 
   const selectedCountry = getCountry(countryCode);
@@ -119,7 +121,7 @@ export function CountryListPopover({ countryCode, onClickCountry }: CountryListP
             fullWidth
             value={searchCountry}
             onChange={handleSearchCountry}
-            placeholder="Search..."
+            placeholder={t('Search...')}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
