@@ -4,6 +4,25 @@ import { AuthRequest } from '../types';
 import * as responseFormatter from '../utils/responseFormatter';
 import { parsePagination, buildOrderClause, calculateMeta } from '../utils/queryBuilder';
 
+// Helper function to recalculate sub-object completion percentage based on its items
+const updateSubObjectPercentage = async (subObjectCardId: number): Promise<void> => {
+  const result = await pool.query(
+    `SELECT AVG(completion_percentage) as avg_percentage
+     FROM sub_object_card_item
+     WHERE sub_object_card_id = $1 AND is_deleted = FALSE`,
+    [subObjectCardId]
+  );
+
+  const avgPercentage = result.rows[0].avg_percentage
+    ? Math.round(parseFloat(result.rows[0].avg_percentage))
+    : 0;
+
+  await pool.query(
+    `UPDATE sub_object_card SET completion_percentage = $1 WHERE id = $2`,
+    [avgPercentage, subObjectCardId]
+  );
+};
+
 export const getAll = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { page, limit, offset } = parsePagination(req.query);
@@ -172,6 +191,9 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       ]
     );
 
+    // Recalculate sub-object completion percentage
+    await updateSubObjectPercentage(sub_object_card_id);
+
     responseFormatter.created(res, result.rows[0], 'Sub-object card item created successfully');
   } catch (error) {
     console.error('Create sub-object card item error:', error);
@@ -251,6 +273,9 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
+    // Recalculate sub-object completion percentage
+    await updateSubObjectPercentage(sub_object_card_id);
+
     responseFormatter.success(res, result.rows[0], 'Sub-object card item updated successfully');
   } catch (error) {
     console.error('Update sub-object card item error:', error);
@@ -262,15 +287,26 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
   try {
     const { id } = req.params;
 
-    const result = await pool.query(
-      'UPDATE sub_object_card_item SET is_deleted = TRUE WHERE id = $1 AND is_deleted = FALSE RETURNING id',
+    // Get the sub_object_card_id before deleting
+    const itemResult = await pool.query(
+      'SELECT sub_object_card_id FROM sub_object_card_item WHERE id = $1 AND is_deleted = FALSE',
       [id]
     );
 
-    if (result.rows.length === 0) {
+    if (itemResult.rows.length === 0) {
       responseFormatter.notFound(res, 'Sub-object card item not found');
       return;
     }
+
+    const subObjectCardId = itemResult.rows[0].sub_object_card_id;
+
+    await pool.query(
+      'UPDATE sub_object_card_item SET is_deleted = TRUE WHERE id = $1 AND is_deleted = FALSE',
+      [id]
+    );
+
+    // Recalculate sub-object completion percentage
+    await updateSubObjectPercentage(subObjectCardId);
 
     responseFormatter.success(res, null, 'Sub-object card item deleted successfully');
   } catch (error) {
