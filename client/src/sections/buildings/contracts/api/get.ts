@@ -8,6 +8,7 @@ export interface IContract {
   contract_number: string | null;
   contract_date: string | null;
   contract_amount: number | null;
+  stage: string | null;
   object_name: string;
   card_number: string;
   created_at: string;

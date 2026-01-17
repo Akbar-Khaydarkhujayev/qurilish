@@ -1,12 +1,17 @@
-import { useState } from 'react';
 import { useParams } from 'react-router';
+import { useMemo, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
+import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableFooter from '@mui/material/TableFooter';
 
 import { useBoolean } from 'src/hooks/use-boolean';
+
+import { fNumber } from 'src/utils/format-number';
 
 import { useTranslate } from 'src/locales';
 
@@ -30,6 +35,11 @@ export default function EstimatesView() {
 
   const { mutate: deleteEstimate } = useDeleteEstimate();
   const { data } = useGetEstimatesByObjectCard(objectCardId || '');
+
+  const totalAmount = useMemo(
+    () => data?.reduce((sum, item) => sum + (item.year_total || 0), 0) || 0,
+    [data]
+  );
 
   return (
     <>
@@ -89,6 +99,45 @@ export default function EstimatesView() {
 
                 <TableNoData notFound={!data?.length} sx={{ height: 'calc(100vh - 370px)' }} />
               </TableBody>
+
+              {data?.length ? (
+                <TableFooter
+                  sx={{
+                    position: 'sticky',
+                    bottom: 0,
+                    zIndex: 1,
+                    bgcolor: 'background.paper',
+                  }}
+                >
+                  <TableRow>
+                    <TableCell
+                      colSpan={2}
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                        borderTop: '2px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      {t('Total')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                        borderTop: '2px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      {fNumber(totalAmount)}
+                    </TableCell>
+                    <TableCell
+                      colSpan={2}
+                      sx={{ borderTop: '2px solid', borderColor: 'divider' }}
+                    />
+                  </TableRow>
+                </TableFooter>
+              ) : null}
             </Table>
           </Scrollbar>
         </Box>

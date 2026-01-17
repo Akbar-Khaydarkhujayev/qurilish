@@ -4,9 +4,14 @@ import { useParams } from 'react-router';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import Button from '@mui/material/Button';
+import TableRow from '@mui/material/TableRow';
 import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableFooter from '@mui/material/TableFooter';
 
 import { useBoolean } from 'src/hooks/use-boolean';
+
+import { fNumber } from 'src/utils/format-number';
 
 import { useTranslate } from 'src/locales';
 
@@ -100,6 +105,45 @@ export default function InvoicesView() {
                   sx={{ height: 'calc(100vh - 370px)' }}
                 />
               </TableBody>
+
+              {data?.invoices?.length ? (
+                <TableFooter
+                  sx={{
+                    position: 'sticky',
+                    bottom: 0,
+                    zIndex: 1,
+                    bgcolor: 'background.paper',
+                  }}
+                >
+                  <TableRow>
+                    <TableCell
+                      colSpan={2}
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                        borderTop: '2px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      {t('Total')}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 'bold',
+                        fontSize: '1rem',
+                        borderTop: '2px solid',
+                        borderColor: 'divider',
+                      }}
+                    >
+                      {fNumber(data?.totalAmount || 0)}
+                    </TableCell>
+                    <TableCell
+                      colSpan={4}
+                      sx={{ borderTop: '2px solid', borderColor: 'divider' }}
+                    />
+                  </TableRow>
+                </TableFooter>
+              ) : null}
             </Table>
           </Scrollbar>
         </Box>

@@ -21,8 +21,12 @@ END $$;
 ALTER TABLE files
 ADD COLUMN IF NOT EXISTS description TEXT;
 
+-- Add stage column to object_contract table
+ALTER TABLE object_contract
+ADD COLUMN IF NOT EXISTS stage VARCHAR(255);
+
 -- Success message
 DO $$
 BEGIN
-    RAISE NOTICE 'Migration 002 completed: Added building_type to object_card and description to files';
+    RAISE NOTICE 'Migration 002 completed: Added building_type to object_card, description to files, and stage to object_contract';
 END $$;

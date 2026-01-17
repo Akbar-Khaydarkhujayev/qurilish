@@ -23,6 +23,7 @@ export const ContractRowItem = ({ row, remove, edit }: RowItemProps<IContract>) 
         {row.contract_date ? dayjs(row.contract_date).format('DD.MM.YYYY') : '-'}
       </TableCell>
       <TableCell>{fNumber(row.contract_amount) || '-'}</TableCell>
+      <TableCell>{row.stage || '-'}</TableCell>
       <TableCell>{dayjs(row.created_at).format('DD.MM.YYYY') || '-'}</TableCell>
 
       <TableCell align="right">

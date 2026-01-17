@@ -19,7 +19,7 @@ import { ContractDialog } from './components/dialog';
 import { ContractRowItem } from './components/row-item';
 import { useGetContractsByObjectCard } from './api/get';
 
-const headLabels = ['Contract Number', 'Contract Date', 'Contract Amount', 'Created at', ''];
+const headLabels = ['Contract Number', 'Contract Date', 'Contract Amount', 'Stage', 'Created at', ''];
 
 export default function ContractsView() {
   const { t } = useTranslate();

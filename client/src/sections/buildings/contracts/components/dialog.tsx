@@ -38,6 +38,7 @@ export const ContractDialog = ({ open, onClose, editedContractId, objectCardId }
     contract_number: '',
     contract_date: null,
     contract_amount: undefined,
+    stage: '',
   };
 
   const methods = useForm<FormFields>({
@@ -54,6 +55,7 @@ export const ContractDialog = ({ open, onClose, editedContractId, objectCardId }
       contract_number: contract?.data.contract_number || '',
       contract_date: contract?.data.contract_date?.split('T')[0] || null,
       contract_amount: Number(contract?.data.contract_amount || 0),
+      stage: contract?.data.stage || '',
     });
   }, [contract, methods, open, editedContractId, objectCardId]);
 
@@ -98,6 +100,7 @@ export const ContractDialog = ({ open, onClose, editedContractId, objectCardId }
               label={t('Contract Amount')}
               type="number"
             />
+            <Field.Text size="small" sx={{ mb: 2 }} name="stage" label={t('Stage')} />
 
             <Box display="flex" justifyContent="flex-end" gap={1} mb={3}>
               <Button

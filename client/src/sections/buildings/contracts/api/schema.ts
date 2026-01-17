@@ -6,6 +6,7 @@ export const formSchema = z.object({
   contract_number: z.string().optional(),
   contract_date: z.string().optional().nullable(),
   contract_amount: z.number().optional(),
+  stage: z.string().optional(),
 });
 
 export type FormFields = z.infer<typeof formSchema>;

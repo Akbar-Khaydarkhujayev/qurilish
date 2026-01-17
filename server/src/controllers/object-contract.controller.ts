@@ -106,7 +106,7 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
 
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { object_card_id, contract_number, contract_date, contract_amount } = req.body;
+    const { object_card_id, contract_number, contract_date, contract_amount, stage } = req.body;
 
     if (!object_card_id) {
       responseFormatter.badRequest(res, 'Object card ID is required');
@@ -138,9 +138,9 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
     }
 
     const result = await pool.query(
-      `INSERT INTO object_contract (object_card_id, contract_number, contract_date, contract_amount)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [object_card_id, contract_number || null, contract_date || null, contract_amount || null]
+      `INSERT INTO object_contract (object_card_id, contract_number, contract_date, contract_amount, stage)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [object_card_id, contract_number || null, contract_date || null, contract_amount || null, stage || null]
     );
 
     responseFormatter.created(res, result.rows[0], 'Contract created successfully');
@@ -153,7 +153,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { object_card_id, contract_number, contract_date, contract_amount } = req.body;
+    const { object_card_id, contract_number, contract_date, contract_amount, stage } = req.body;
 
     if (!object_card_id) {
       responseFormatter.badRequest(res, 'Object card ID is required');
@@ -186,10 +186,10 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
     const result = await pool.query(
       `UPDATE object_contract
-       SET object_card_id = $1, contract_number = $2, contract_date = $3, contract_amount = $4
-       WHERE id = $5 AND is_deleted = FALSE
+       SET object_card_id = $1, contract_number = $2, contract_date = $3, contract_amount = $4, stage = $5
+       WHERE id = $6 AND is_deleted = FALSE
        RETURNING *`,
-      [object_card_id, contract_number || null, contract_date || null, contract_amount || null, id]
+      [object_card_id, contract_number || null, contract_date || null, contract_amount || null, stage || null, id]
     );
 
     if (result.rows.length === 0) {

@@ -67,15 +67,30 @@ export const getById = async (req: AuthRequest, res: Response): Promise<void> =>
       return;
     }
 
-    // Get items count for this sub-object
-    const itemsCount = await pool.query(
-      'SELECT COUNT(*) FROM sub_object_card_item WHERE sub_object_card_id = $1 AND is_deleted = FALSE',
+    // Get items count, total cost and average completion percentage for this sub-object
+    const itemsResult = await pool.query(
+      `SELECT
+        COUNT(*) as items_count,
+        COALESCE(SUM(cost), 0) as total_cost,
+        CASE
+          WHEN COUNT(*) > 0 THEN ROUND(AVG(COALESCE(completion_percentage, 0)))
+          ELSE 0
+        END as avg_completion_percentage
+       FROM sub_object_card_item
+       WHERE sub_object_card_id = $1 AND is_deleted = FALSE`,
       [id]
     );
 
+    const itemsData = itemsResult.rows[0];
+    const hasItems = parseInt(itemsData.items_count) > 0;
+    const subObject = result.rows[0];
+
     responseFormatter.success(res, {
-      ...result.rows[0],
-      items_count: parseInt(itemsCount.rows[0].count),
+      ...subObject,
+      items_count: parseInt(itemsData.items_count),
+      // Use calculated values from children if items exist, otherwise use sub-object's own values
+      cost: hasItems ? parseFloat(itemsData.total_cost) : subObject.cost,
+      completion_percentage: hasItems ? parseInt(itemsData.avg_completion_percentage) : subObject.completion_percentage,
     }, 'Sub-object card retrieved successfully');
   } catch (error) {
     console.error('Get sub-object card error:', error);
@@ -105,21 +120,36 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
       [objectCardId]
     );
 
-    // Get items count for each sub-object
-    const subObjectsWithCounts = await Promise.all(
+    // Get items count, calculated cost and completion percentage for each sub-object
+    const subObjectsWithCalculations = await Promise.all(
       result.rows.map(async (subObject) => {
-        const itemsCount = await pool.query(
-          'SELECT COUNT(*) FROM sub_object_card_item WHERE sub_object_card_id = $1 AND is_deleted = FALSE',
+        const itemsResult = await pool.query(
+          `SELECT
+            COUNT(*) as items_count,
+            COALESCE(SUM(cost), 0) as total_cost,
+            CASE
+              WHEN COUNT(*) > 0 THEN ROUND(AVG(COALESCE(completion_percentage, 0)))
+              ELSE 0
+            END as avg_completion_percentage
+           FROM sub_object_card_item
+           WHERE sub_object_card_id = $1 AND is_deleted = FALSE`,
           [subObject.id]
         );
+
+        const itemsData = itemsResult.rows[0];
+        const hasItems = parseInt(itemsData.items_count) > 0;
+
         return {
           ...subObject,
-          items_count: parseInt(itemsCount.rows[0].count),
+          items_count: parseInt(itemsData.items_count),
+          // Use calculated values from children if items exist, otherwise use sub-object's own values
+          cost: hasItems ? parseFloat(itemsData.total_cost) : subObject.cost,
+          completion_percentage: hasItems ? parseInt(itemsData.avg_completion_percentage) : subObject.completion_percentage,
         };
       })
     );
 
-    responseFormatter.success(res, subObjectsWithCounts, 'Sub-object cards retrieved successfully');
+    responseFormatter.success(res, subObjectsWithCalculations, 'Sub-object cards retrieved successfully');
   } catch (error) {
     console.error('Get sub-object cards by object card error:', error);
     responseFormatter.error(res, 'Error retrieving sub-object cards');

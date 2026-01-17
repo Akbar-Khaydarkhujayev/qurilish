@@ -148,6 +148,7 @@ CREATE TABLE object_contract (
     contract_number VARCHAR(100),
     contract_date DATE,
     contract_amount NUMERIC(15, 2),
+    stage VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT FALSE
