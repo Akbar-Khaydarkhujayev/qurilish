@@ -11,7 +11,7 @@ import { AuthGuard } from 'src/auth/guard';
 // ----------------------------------------------------------------------
 
 const Page404 = lazy(() => import('src/pages/error/404'));
-const IndexPage = lazy(() => import('src/pages/dashboard/one'));
+const IndexPage = lazy(() => import('src/pages/dashboard'));
 const BuildingsPage = lazy(() => import('src/pages/dashboard/buildings'));
 const OrganizationsPage = lazy(() => import('src/pages/dashboard/settings/organizations'));
 const UsersPage = lazy(() => import('src/pages/dashboard/settings/users'));
