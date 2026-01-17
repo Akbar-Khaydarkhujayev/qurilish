@@ -120,7 +120,7 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
 
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { object_card_id } = req.body;
+    const { object_card_id, description } = req.body;
     const file = req.file;
 
     if (!object_card_id) {
@@ -148,9 +148,9 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
     const fileName = file.originalname;
 
     const result = await pool.query(
-      `INSERT INTO files (object_card_id, path, file_name)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [object_card_id, filePath, fileName]
+      `INSERT INTO files (object_card_id, path, file_name, description)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [object_card_id, filePath, fileName, description || null]
     );
 
     responseFormatter.created(res, result.rows[0], 'File uploaded successfully');
@@ -251,5 +251,106 @@ export const download = async (req: AuthRequest, res: Response): Promise<void> =
   } catch (error) {
     console.error('Download file error:', error);
     responseFormatter.error(res, 'Error downloading file');
+  }
+};
+
+// Helper function to get MIME type from file extension
+const getMimeType = (fileName: string): string => {
+  const ext = path.extname(fileName).toLowerCase();
+  const mimeTypes: { [key: string]: string } = {
+    '.pdf': 'application/pdf',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.bmp': 'image/bmp',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.txt': 'text/plain',
+    '.csv': 'text/csv',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.xls': 'application/vnd.ms-excel',
+    '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    '.ppt': 'application/vnd.ms-powerpoint',
+    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  };
+  return mimeTypes[ext] || 'application/octet-stream';
+};
+
+// Check if file can be previewed in browser
+const isPreviewable = (fileName: string): boolean => {
+  const ext = path.extname(fileName).toLowerCase();
+  const previewableExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.txt'];
+  return previewableExtensions.includes(ext);
+};
+
+export const preview = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      'SELECT * FROM files WHERE id = $1 AND is_deleted = FALSE',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      responseFormatter.notFound(res, 'File not found');
+      return;
+    }
+
+    const file = result.rows[0];
+    const filePath = path.join(__dirname, '../..', file.path);
+
+    if (!fs.existsSync(filePath)) {
+      responseFormatter.notFound(res, 'File not found on disk');
+      return;
+    }
+
+    const mimeType = getMimeType(file.file_name);
+    const canPreview = isPreviewable(file.file_name);
+
+    if (!canPreview) {
+      responseFormatter.badRequest(res, 'File type cannot be previewed');
+      return;
+    }
+
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(file.file_name)}"`);
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error('Preview file error:', error);
+    responseFormatter.error(res, 'Error previewing file');
+  }
+};
+
+export const getFileInfo = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      'SELECT * FROM files WHERE id = $1 AND is_deleted = FALSE',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      responseFormatter.notFound(res, 'File not found');
+      return;
+    }
+
+    const file = result.rows[0];
+    const canPreview = isPreviewable(file.file_name);
+    const mimeType = getMimeType(file.file_name);
+
+    responseFormatter.success(res, {
+      ...file,
+      can_preview: canPreview,
+      mime_type: mimeType,
+    }, 'File info retrieved successfully');
+  } catch (error) {
+    console.error('Get file info error:', error);
+    responseFormatter.error(res, 'Error retrieving file info');
   }
 };

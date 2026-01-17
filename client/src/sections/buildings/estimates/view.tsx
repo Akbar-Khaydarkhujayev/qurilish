@@ -64,7 +64,7 @@ export default function EstimatesView() {
             bgcolor: 'background.paper',
           }}
         >
-          <Scrollbar sx={{ height: 'calc(100vh - 320px)' }}>
+          <Scrollbar sx={{ height: 'calc(100vh - 340px)' }}>
             <Table size="small" stickyHeader>
               <TableHeadCustom
                 headLabel={headLabels.map((label) => ({

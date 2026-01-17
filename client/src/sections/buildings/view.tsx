@@ -26,7 +26,7 @@ import { useGetDistricts } from '../settings/districts/api/get';
 import { useGetConstructionStatuses } from '../settings/construction-statuses/api/get';
 
 const headLabels = [
-  'Card Number',
+  'Object ID',
   'Object Name',
   'Region',
   'District',

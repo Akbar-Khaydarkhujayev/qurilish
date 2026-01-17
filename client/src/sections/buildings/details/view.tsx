@@ -112,7 +112,7 @@ export default function DetailsView() {
         <Form methods={methods} onSubmit={onSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
-              <Field.Text size="small" name="card_number" label={t('Card Number')} fullWidth />
+              <Field.Text size="small" name="card_number" label={t('Object ID')} fullWidth />
             </Grid>
             <Grid item xs={12} md={6}>
               <Field.Text

@@ -135,7 +135,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
       <DialogContent>
         <Form methods={methods} onSubmit={onSubmit}>
           <Box pt={1} display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2}>
-            <Field.Text size="small" name="card_number" label={t('Card Number')} />
+            <Field.Text size="small" name="card_number" label={t('Object ID')} />
             <Field.Text required size="small" name="object_name" label={t('Object Name')} />
 
             <Field.Select required size="small" name="building_type" label={t('Building Type')}>

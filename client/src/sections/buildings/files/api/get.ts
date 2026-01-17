@@ -7,6 +7,7 @@ export interface IFile {
   object_card_id: number;
   path: string;
   file_name: string;
+  description: string | null;
   object_name: string;
   card_number: string;
   created_at: string;

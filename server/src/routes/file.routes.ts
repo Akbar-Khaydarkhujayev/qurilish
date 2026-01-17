@@ -30,6 +30,8 @@ router.get('/files', authenticate, fileController.getAll);
 router.post('/files', authenticate, upload.single('file'), fileController.create);
 router.get('/files/:id', authenticate, fileController.getById);
 router.get('/files/:id/download', authenticate, fileController.download);
+router.get('/files/:id/preview', authenticate, fileController.preview);
+router.get('/files/:id/info', authenticate, fileController.getFileInfo);
 router.put('/files/:id', authenticate, fileController.update);
 router.delete('/files/:id', authenticate, fileController.remove);
 router.get('/object-cards/:objectCardId/files', authenticate, fileController.getByObjectCardId);

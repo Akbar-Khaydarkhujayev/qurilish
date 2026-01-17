@@ -2,7 +2,7 @@ import { toast } from 'sonner';
 import { useState, useCallback } from 'react';
 
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Dialog, Button, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Dialog, Button, TextField, DialogTitle, DialogContent } from '@mui/material';
 
 import { useTranslate } from 'src/locales';
 
@@ -21,6 +21,7 @@ export const FileUploadDialog = ({ open, onClose, objectCardId }: IProps) => {
   const { t } = useTranslate();
 
   const [file, setFile] = useState<File | null>(null);
+  const [description, setDescription] = useState('');
   const [uploading, setUploading] = useState(false);
 
   const { mutate: uploadFile } = useUploadFile();
@@ -38,6 +39,7 @@ export const FileUploadDialog = ({ open, onClose, objectCardId }: IProps) => {
 
   const handleClose = () => {
     setFile(null);
+    setDescription('');
     onClose();
   };
 
@@ -46,12 +48,13 @@ export const FileUploadDialog = ({ open, onClose, objectCardId }: IProps) => {
 
     setUploading(true);
     uploadFile(
-      { object_card_id: Number(objectCardId), file },
+      { object_card_id: Number(objectCardId), file, description: description || undefined },
       {
         onSuccess: () => {
           toast.success(t('File uploaded successfully'));
           setUploading(false);
           setFile(null);
+          setDescription('');
           onClose();
         },
         onError: () => {
@@ -89,6 +92,17 @@ export const FileUploadDialog = ({ open, onClose, objectCardId }: IProps) => {
               'application/x-rar-compressed': ['.rar'],
               'application/x-7z-compressed': ['.7z'],
             }}
+          />
+
+          <TextField
+            fullWidth
+            size="small"
+            label={t('Description')}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            multiline
+            rows={2}
+            sx={{ mt: 2 }}
           />
 
           <Box display="flex" justifyContent="flex-end" gap={1} mt={3} mb={1}>

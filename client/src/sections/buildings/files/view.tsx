@@ -18,7 +18,7 @@ import { FileRowItem } from './components/row-item';
 import { useGetFilesByObjectCard } from './api/get';
 import { FileUploadDialog } from './components/upload-dialog';
 
-const headLabels = ['File Name', 'Created at', ''];
+const headLabels = ['File Name', 'Description', 'Created at', ''];
 
 export default function FilesView() {
   const { t } = useTranslate();
@@ -58,7 +58,7 @@ export default function FilesView() {
             bgcolor: 'background.paper',
           }}
         >
-          <Scrollbar sx={{ height: 'calc(100vh - 320px)' }}>
+          <Scrollbar sx={{ height: 'calc(100vh - 340px)' }}>
             <Table size="small" stickyHeader>
               <TableHeadCustom
                 headLabel={headLabels.map((label) => ({

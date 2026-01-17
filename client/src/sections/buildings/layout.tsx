@@ -40,17 +40,24 @@ export default function BuildingDetailLayout() {
           <Iconify icon="solar:arrow-left-bold" />
         </IconButton>
         <Box>
-          <Typography variant="h4">{building?.data?.object_name || t('Building Details')}</Typography>
+          <Typography variant="h4">
+            {building?.data?.object_name || t('Building Details')}
+          </Typography>
           {building?.data?.card_number && (
             <Typography variant="body2" color="text.secondary">
-              {t('Card Number')}: {building.data.card_number}
+              {t('Object ID')}: {building.data.card_number}
             </Typography>
           )}
         </Box>
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={currentTab} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
+        <Tabs
+          value={currentTab}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
           {TABS.map((tab) => (
             <Tab
               key={tab.value}

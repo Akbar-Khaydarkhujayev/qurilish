@@ -236,6 +236,7 @@ CREATE TABLE files (
     object_card_id INTEGER NOT NULL REFERENCES object_card(id) ON DELETE CASCADE,
     path TEXT NOT NULL,
     file_name VARCHAR(255) NOT NULL,
+    description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT FALSE
