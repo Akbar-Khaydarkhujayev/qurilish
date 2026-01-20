@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: qurilish_postgres
+    container_name: qurilish_postgres_prod
     restart: unless-stopped
     environment:
       POSTGRES_DB: qurilish_db
@@ -12,9 +12,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
-      - ./database/seeds:/docker-entrypoint-initdb.d/seeds
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./database/init-prod.sql:/docker-entrypoint-initdb.d/01-init.sql
 
 volumes:
-  postgres_data:
+  postgres_data_prod:

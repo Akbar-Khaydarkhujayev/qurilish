@@ -12,6 +12,8 @@ import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
+import { useAuthContext } from 'src/auth/hooks';
+
 import { formSchema } from '../api/schema';
 import { useEditBuilding } from '../api/edit';
 import { useGetBuildingById } from '../api/get-by-id';
@@ -47,6 +49,7 @@ const defaultValues: FormFields = {
 export default function DetailsView() {
   const { t } = useTranslate();
   const { id } = useParams();
+  const { user } = useAuthContext();
 
   const { data: building } = useGetBuildingById(id);
   const { data: regionsData } = useGetRegions({ page: 1, limit: 100 });
@@ -71,28 +74,26 @@ export default function DetailsView() {
   });
 
   useEffect(() => {
-    if (building?.data) {
-      methods.reset({
-        id: building.data.id,
-        card_number: building.data.card_number || '',
-        object_name: building.data.object_name || '',
-        address: building.data.address || '',
-        region_id: building.data.region_id,
-        district_id: building.data.district_id,
-        construction_basis: building.data.construction_basis || '',
-        project_organization_id: building.data.project_organization_id,
-        // object_passport: building.data.object_passport || '',
-        contractor_id: building.data.contractor_id,
-        technical_supervisor_id: building.data.technical_supervisor_id,
-        construction_start_date: building.data.construction_start_date?.split('T')[0] || null,
-        construction_end_date: building.data.construction_end_date?.split('T')[0] || null,
-        construction_status_id: building.data.construction_status_id,
-        construction_cost: building.data.construction_cost || '',
-        organization_id: building.data.organization_id,
-        building_type: building?.data?.building_type || 'new_building',
-      });
-    }
-  }, [building, methods]);
+    methods.reset({
+      id: building?.data?.id,
+      card_number: building?.data?.card_number || '',
+      object_name: building?.data?.object_name || '',
+      address: building?.data?.address || '',
+      region_id: building?.data?.region_id,
+      district_id: building?.data?.district_id,
+      construction_basis: building?.data?.construction_basis || '',
+      project_organization_id: building?.data?.project_organization_id,
+      // object_passport: building?.data?.object_passport || '',
+      contractor_id: building?.data?.contractor_id,
+      technical_supervisor_id: building?.data?.technical_supervisor_id,
+      construction_start_date: building?.data?.construction_start_date?.split('T')[0] || null,
+      construction_end_date: building?.data?.construction_end_date?.split('T')[0] || null,
+      construction_status_id: building?.data?.construction_status_id,
+      construction_cost: building?.data?.construction_cost || '',
+      organization_id: building?.data?.organization_id || user?.organizationId,
+      building_type: building?.data?.building_type || 'new_building',
+    });
+  }, [building, methods, user]);
 
   const onSubmit = methods.handleSubmit(
     async (data) => {
@@ -198,6 +199,7 @@ export default function DetailsView() {
             <Grid item xs={12} md={6}>
               <Field.Select
                 required
+                disabled
                 size="small"
                 name="organization_id"
                 label={t('Organization')}

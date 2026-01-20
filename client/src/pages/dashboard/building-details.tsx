@@ -2,11 +2,11 @@ import { Helmet } from 'react-helmet-async';
 
 import { CONFIG } from 'src/config-global';
 
-import { DashboardView } from 'src/sections/dashboard/view';
+import { BuildingDetailsView } from 'src/sections/dashboard/building-details-view';
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `Dashboard - ${CONFIG.site.name}` };
+const metadata = { title: `Building Details - ${CONFIG.site.name}` };
 
 export default function Page() {
   return (
@@ -15,7 +15,7 @@ export default function Page() {
         <title> {metadata.title}</title>
       </Helmet>
 
-      <DashboardView />
+      <BuildingDetailsView />
     </>
   );
 }

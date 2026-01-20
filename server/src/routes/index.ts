@@ -7,6 +7,7 @@ import objectCardRoutes from './object-card.routes';
 import objectRelatedRoutes from './object-related.routes';
 import financialRoutes from './financial.routes';
 import fileRoutes from './file.routes';
+import dashboardRoutes from './dashboard.routes';
 
 const router = Router();
 
@@ -33,6 +34,9 @@ router.use('/', financialRoutes);
 
 // File routes
 router.use('/', fileRoutes);
+
+// Dashboard routes
+router.use('/dashboard', dashboardRoutes);
 
 // Health check endpoint
 router.get('/health', (_req, res) => {

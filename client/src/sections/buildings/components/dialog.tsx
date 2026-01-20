@@ -26,26 +26,6 @@ import { useGetProjectOrganizations } from '../../settings/project-organizations
 
 import type { FormFields } from '../api/schema';
 
-const defaultValues: FormFields = {
-  id: undefined,
-  card_number: '',
-  object_name: '',
-  address: '',
-  region_id: undefined as unknown as number,
-  district_id: undefined as unknown as number,
-  construction_basis: '',
-  project_organization_id: undefined as unknown as number,
-  // object_passport: '',
-  contractor_id: undefined as unknown as number,
-  technical_supervisor_id: null,
-  construction_start_date: null,
-  construction_end_date: null,
-  construction_status_id: undefined as unknown as number,
-  construction_cost: '',
-  organization_id: undefined as unknown as number,
-  building_type: 'new_building',
-};
-
 interface IProps {
   open: boolean;
   onClose: () => void;
@@ -68,9 +48,8 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
 
   const methods = useForm<FormFields>({
     resolver: zodResolver(formSchema),
-    defaultValues,
   });
-  console.log(user);
+
   const selectedRegionId = methods.watch('region_id');
 
   const { data: districtsData } = useGetDistricts({
@@ -99,11 +78,29 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         construction_end_date: building.data.construction_end_date?.split('T')[0] || null,
         construction_status_id: building.data.construction_status_id,
         construction_cost: building.data.construction_cost || '',
-        organization_id: building.data.organization_id || user?.organization_id,
+        organization_id: building.data.organization_id,
         building_type: building.data.building_type || 'new_building',
       });
     } else {
-      methods.reset(defaultValues);
+      methods.reset({
+        id: undefined,
+        card_number: '',
+        object_name: '',
+        address: '',
+        region_id: undefined as unknown as number,
+        district_id: undefined as unknown as number,
+        construction_basis: '',
+        project_organization_id: undefined as unknown as number,
+        // object_passport: '',
+        contractor_id: undefined as unknown as number,
+        technical_supervisor_id: null,
+        construction_start_date: null,
+        construction_end_date: null,
+        construction_status_id: undefined as unknown as number,
+        construction_cost: '',
+        organization_id: user?.organizationId || (undefined as unknown as number),
+        building_type: 'new_building',
+      });
     }
   }, [building, methods, open, editedBuildingId, user]);
 
@@ -127,7 +124,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
     },
     (err) => console.log(err)
   );
-
+  console.log(methods.watch());
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle textAlign="center">{editedBuildingId ? t('edit') : t('add')}</DialogTitle>
@@ -173,7 +170,6 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
 
             <Field.Select
               required
-              disabled
               size="small"
               name="project_organization_id"
               label={t('Project Organization')}
@@ -193,7 +189,13 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
               ))}
             </Field.Select>
 
-            <Field.Select required size="small" name="organization_id" label={t('Organization')}>
+            <Field.Select
+              required
+              disabled
+              size="small"
+              name="organization_id"
+              label={t('Organization')}
+            >
               {organizationsData?.data.map((org) => (
                 <MenuItem key={org.id} value={org.id}>
                   {org.name}

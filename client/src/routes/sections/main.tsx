@@ -12,6 +12,7 @@ import { AuthGuard } from 'src/auth/guard';
 
 const Page404 = lazy(() => import('src/pages/error/404'));
 const IndexPage = lazy(() => import('src/pages/dashboard'));
+const DashboardBuildingDetailsPage = lazy(() => import('src/pages/dashboard/building-details'));
 const BuildingsPage = lazy(() => import('src/pages/dashboard/buildings'));
 const OrganizationsPage = lazy(() => import('src/pages/dashboard/settings/organizations'));
 const UsersPage = lazy(() => import('src/pages/dashboard/settings/users'));
@@ -60,6 +61,7 @@ export const mainRoutes = [
     element: CONFIG.auth.skip ? <>{layoutContent}</> : <AuthGuard>{layoutContent}</AuthGuard>,
     children: [
       { path: 'dashboard', element: <IndexPage /> }, // URL: /dashboard
+      { path: 'dashboard/:id', element: <DashboardBuildingDetailsPage /> }, // URL: /dashboard/:id
       { path: 'buildings', element: <BuildingsPage /> }, // URL: /buildings
       {
         path: 'buildings/:id',

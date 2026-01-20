@@ -36,7 +36,7 @@ export default function BuildingDetailLayout() {
   return (
     <Box>
       <Box display="flex" alignItems="center" gap={2} mb={3}>
-        <IconButton onClick={() => navigate('/buildings')}>
+        <IconButton onClick={() => navigate(-1)}>
           <Iconify icon="solar:arrow-left-bold" />
         </IconButton>
         <Box>
