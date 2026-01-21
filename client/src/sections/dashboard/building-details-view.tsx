@@ -36,6 +36,7 @@ import { Scrollbar } from 'src/components/scrollbar';
 import { Chart, useChart } from 'src/components/chart';
 
 import { useGetBuildingFullDetails } from './api/get-building-details';
+import { useGetSubObjectItems } from '../buildings/sub-objects/items/api/get';
 import { useGetConstructionStatuses } from '../settings/construction-statuses/api/get';
 
 interface DetailRowProps {
@@ -516,6 +517,89 @@ export function BuildingDetailsView() {
         </CardContent>
       </Card>
 
+      {/* Financial Summary Cards */}
+      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+        {/* Total Bank Expenses */}
+        <Card sx={{ flex: 1 }}>
+          <CardContent sx={{ textAlign: 'center', py: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+              <Iconify icon="mdi:bank-transfer-out" width={32} sx={{ color: 'error.main' }} />
+            </Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              {t('Total Expenses')}
+            </Typography>
+            <Typography variant="h4" color="error.main">
+              {details.expenses?.totalAmount ? fNumber(details.expenses.totalAmount) : '0'}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        {/* Total Invoices */}
+        <Card sx={{ flex: 1 }}>
+          <CardContent sx={{ textAlign: 'center', py: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+              <Iconify icon="mdi:receipt" width={32} sx={{ color: 'success.main' }} />
+            </Box>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              {t('Total Invoices')}
+            </Typography>
+            <Typography variant="h4" color="success.main">
+              {details.invoices?.totalAmount ? fNumber(details.invoices.totalAmount) : '0'}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        {/* Difference */}
+        {(() => {
+          const totalExpenses = details.expenses?.totalAmount || 0;
+          const totalInvoices = details.invoices?.totalAmount || 0;
+          const difference = totalExpenses - totalInvoices;
+          const isPositive = difference > 0;
+          const isNegative = difference < 0;
+
+          return (
+            <Card sx={{ flex: 1 }}>
+              <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                  <Iconify
+                    icon={
+                      isPositive
+                        ? 'mdi:arrow-up-circle'
+                        : isNegative
+                          ? 'mdi:arrow-down-circle'
+                          : 'mdi:equal'
+                    }
+                    width={32}
+                    sx={{
+                      color: isPositive
+                        ? 'info.main'
+                        : isNegative
+                          ? 'warning.main'
+                          : 'text.secondary',
+                    }}
+                  />
+                </Box>
+                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                  {isPositive
+                    ? t('Буюртмачи фойдасига')
+                    : isNegative
+                      ? t('Пудратчи фойдасига')
+                      : t('Тенг')}
+                </Typography>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    color: isPositive ? 'info.main' : isNegative ? 'warning.main' : 'text.primary',
+                  }}
+                >
+                  {fNumber(Math.abs(difference))}
+                </Typography>
+              </CardContent>
+            </Card>
+          );
+        })()}
+      </Box>
+
       {/* Files */}
       <Card>
         <CardHeader
@@ -618,17 +702,77 @@ export function BuildingDetailsView() {
 function SubObjectItems({ subObjectId }: { subObjectId: number }) {
   const { t } = useTranslate();
   const theme = useTheme();
+  const { data: items, isLoading } = useGetSubObjectItems(subObjectId);
 
-  // For now, we'll show a placeholder. In production, you'd fetch items here
-  // using useGetSubObjectItems(subObjectId)
+  if (isLoading) {
+    return (
+      <Box sx={{ py: 2, px: 4, bgcolor: theme.palette.background.neutral, textAlign: 'center' }}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (!items || items.length === 0) {
+    return (
+      <Box sx={{ py: 2, px: 4, bgcolor: theme.palette.background.neutral }}>
+        <Typography variant="body2" color="text.secondary">
+          {t('No items')}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ py: 2, px: 4, bgcolor: theme.palette.background.neutral }}>
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>
-        {t('Construction Items')}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {t('Items will be loaded here for sub-object')} #{subObjectId}
-      </Typography>
+    <Box sx={{ py: 1, px: 2, bgcolor: theme.palette.background.neutral }}>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>{t('Item Name')}</TableCell>
+            <TableCell>{t('Deadline')}</TableCell>
+            <TableCell align="right">{t('Cost')}</TableCell>
+            <TableCell>{t('Completion %')}</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {items.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>
+                <Typography variant="body2">{item.item_name || '-'}</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography
+                  variant="body2"
+                  sx={{ color: item.deadline ? 'error.main' : 'text.secondary' }}
+                >
+                  {item.deadline ? dayjs(item.deadline).format('DD.MM.YYYY') : '-'}
+                </Typography>
+              </TableCell>
+              <TableCell align="right">
+                <Typography variant="body2">{item.cost ? fNumber(item.cost) : '-'}</Typography>
+              </TableCell>
+              <TableCell>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={item.completion_percentage || 0}
+                    sx={{ flexGrow: 1, height: 6, borderRadius: 1 }}
+                    color={
+                      item.completion_percentage >= 100
+                        ? 'success'
+                        : item.completion_percentage >= 50
+                          ? 'primary'
+                          : 'warning'
+                    }
+                  />
+                  <Typography variant="caption" sx={{ minWidth: 40 }}>
+                    {fPercent(item.completion_percentage || 0)}
+                  </Typography>
+                </Box>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </Box>
   );
 }
