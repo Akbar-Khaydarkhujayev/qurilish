@@ -226,7 +226,7 @@ export function BuildingDetailsView() {
               {t('Construction Cost')}
             </Typography>
             <Typography variant="h3" color="primary.main">
-              {building.construction_cost ? fNumber(building.construction_cost) : '-'}
+              {building.construction_cost ? `${fNumber(building.construction_cost)} сум` : '-'}
             </Typography>
           </CardContent>
         </Card>
@@ -267,7 +267,9 @@ export function BuildingDetailsView() {
             />
             <DetailRow
               label={t('Ish qiymati')}
-              value={building.construction_cost ? fNumber(building.construction_cost) : null}
+              value={
+                building.construction_cost ? `${fNumber(building.construction_cost)} сум` : null
+              }
             />
             <DetailRow label={t('Texnik nazoratchi')} value={building.technical_supervisor_name} />
           </CardContent>
@@ -529,7 +531,9 @@ export function BuildingDetailsView() {
               {t('Total Expenses')}
             </Typography>
             <Typography variant="h4" color="error.main">
-              {details.expenses?.totalAmount ? fNumber(details.expenses.totalAmount) : '0'}
+              {details.expenses?.totalAmount
+                ? `${fNumber(details.expenses.totalAmount)} сум`
+                : '0 сум'}
             </Typography>
           </CardContent>
         </Card>
@@ -544,7 +548,9 @@ export function BuildingDetailsView() {
               {t('Total Invoices')}
             </Typography>
             <Typography variant="h4" color="success.main">
-              {details.invoices?.totalAmount ? fNumber(details.invoices.totalAmount) : '0'}
+              {details.invoices?.totalAmount
+                ? `${fNumber(details.invoices.totalAmount)} сум`
+                : '0 сум'}
             </Typography>
           </CardContent>
         </Card>
@@ -592,7 +598,7 @@ export function BuildingDetailsView() {
                     color: isPositive ? 'info.main' : isNegative ? 'warning.main' : 'text.primary',
                   }}
                 >
-                  {fNumber(Math.abs(difference))}
+                  {`${fNumber(Math.abs(difference))} сум`}
                 </Typography>
               </CardContent>
             </Card>
