@@ -26,8 +26,11 @@ export const getAll = async (req: AuthRequest, res: Response): Promise<void> => 
     );
     const total = parseInt(countResult.rows[0].count);
 
+    // Default order by sequence
+    const defaultOrder = sort_by ? orderClause : 'ORDER BY sequence ASC, id ASC';
+
     const result = await pool.query(
-      `SELECT * FROM construction_status ${whereClause} ${orderClause} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      `SELECT * FROM construction_status ${whereClause} ${defaultOrder} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
       [...params, limit, offset]
     );
 
@@ -61,7 +64,7 @@ export const getById = async (req: AuthRequest, res: Response): Promise<void> =>
 
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name } = req.body;
+    const { name, sequence } = req.body;
 
     if (!name) {
       responseFormatter.badRequest(res, 'Status name is required');
@@ -79,9 +82,18 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
+    // Get max sequence if not provided
+    let seq = sequence;
+    if (seq === undefined || seq === null) {
+      const maxSeqResult = await pool.query(
+        'SELECT COALESCE(MAX(sequence), 0) + 1 as next_seq FROM construction_status WHERE is_deleted = FALSE'
+      );
+      seq = maxSeqResult.rows[0].next_seq;
+    }
+
     const result = await pool.query(
-      'INSERT INTO construction_status (name) VALUES ($1) RETURNING *',
-      [name]
+      'INSERT INTO construction_status (name, sequence) VALUES ($1, $2) RETURNING *',
+      [name, seq]
     );
 
     responseFormatter.created(res, result.rows[0], 'Construction status created successfully');
@@ -94,7 +106,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, sequence } = req.body;
 
     if (!name) {
       responseFormatter.badRequest(res, 'Status name is required');
@@ -112,10 +124,19 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
-    const result = await pool.query(
-      'UPDATE construction_status SET name = $1 WHERE id = $2 AND is_deleted = FALSE RETURNING *',
-      [name, id]
-    );
+    // Build update query based on whether sequence is provided
+    let result;
+    if (sequence !== undefined && sequence !== null) {
+      result = await pool.query(
+        'UPDATE construction_status SET name = $1, sequence = $2 WHERE id = $3 AND is_deleted = FALSE RETURNING *',
+        [name, sequence, id]
+      );
+    } else {
+      result = await pool.query(
+        'UPDATE construction_status SET name = $1 WHERE id = $2 AND is_deleted = FALSE RETURNING *',
+        [name, id]
+      );
+    }
 
     if (result.rows.length === 0) {
       responseFormatter.notFound(res, 'Construction status not found');

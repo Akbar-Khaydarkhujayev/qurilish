@@ -71,6 +71,7 @@ CREATE TABLE contractor (
 CREATE TABLE construction_status (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    sequence INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_deleted BOOLEAN DEFAULT FALSE
@@ -286,12 +287,12 @@ CREATE TRIGGER update_invoices_updated_at BEFORE UPDATE ON invoices FOR EACH ROW
 CREATE TRIGGER update_files_updated_at BEFORE UPDATE ON files FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert default construction statuses
-INSERT INTO construction_status (name) VALUES
-    ('Планируется'),
-    ('В процессе'),
-    ('Завершено'),
-    ('Приостановлено'),
-    ('Отменено');
+INSERT INTO construction_status (name, sequence) VALUES
+    ('Loyiha tayyorlash', 1),
+    ('Qurilish ishlari', 2),
+    ('Ichki bezak ishlari', 3),
+    ('Nazorat va tekshirish', 4),
+    ('Topshirish', 5);
 
 -- Success message
 DO $$

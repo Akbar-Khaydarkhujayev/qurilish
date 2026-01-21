@@ -21,6 +21,7 @@ import { formSchema, BUILDING_TYPE_OPTIONS } from '../api/schema';
 import { useGetDistricts } from '../../settings/districts/api/get';
 import { useGetContractors } from '../../settings/contractors/api/get';
 import { useGetOrganizations } from '../../settings/organizations/api/get';
+import { useGetUsers } from '../../settings/users/api/get';
 import { useGetConstructionStatuses } from '../../settings/construction-statuses/api/get';
 import { useGetProjectOrganizations } from '../../settings/project-organizations/api/get';
 
@@ -42,6 +43,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
   const { data: organizationsData } = useGetOrganizations({ page: 1, limit: 100 });
   const { data: statusesData } = useGetConstructionStatuses({ page: 1, limit: 100 });
   const { data: projectOrgsData } = useGetProjectOrganizations({ page: 1, limit: 100 });
+  const { data: usersData } = useGetUsers({ page: 1, limit: 100 });
 
   const { mutate: edit } = useEditBuilding();
   const { mutate: create } = useCreateBuilding();
@@ -214,6 +216,17 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
                   {status.name}
                 </MenuItem>
               ))}
+            </Field.Select>
+
+            <Field.Select size="small" name="technical_supervisor_id" label={t('Texnik nazoratchi')}>
+              <MenuItem value="">{t('Tanlanmagan')}</MenuItem>
+              {usersData?.data
+                .filter((u) => u.role === 'user')
+                .map((techUser) => (
+                  <MenuItem key={techUser.id} value={techUser.id}>
+                    {techUser.name} ({techUser.username})
+                  </MenuItem>
+                ))}
             </Field.Select>
 
             {/* <Field.Text size="small" name="object_passport" label={t('Object Passport')} /> */}

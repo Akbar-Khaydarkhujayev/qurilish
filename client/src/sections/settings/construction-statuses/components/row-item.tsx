@@ -2,7 +2,7 @@ import type { RowItemProps } from 'src/types/global';
 
 import dayjs from 'dayjs';
 
-import { Box, Tooltip, TableRow, TableCell, IconButton } from '@mui/material';
+import { Box, Chip, Tooltip, TableRow, TableCell, IconButton } from '@mui/material';
 
 import { useTranslate } from 'src/locales';
 
@@ -16,6 +16,9 @@ export const ConstructionStatusRowItem = ({ row, remove, edit }: RowItemProps<IC
 
   return (
     <TableRow hover>
+      <TableCell>
+        <Chip label={row.sequence} size="small" color="primary" variant="outlined" />
+      </TableCell>
       <TableCell>{row.name || '-'}</TableCell>
       <TableCell>{dayjs(row.created_at).format('DD.MM.YYYY') || '-'}</TableCell>
 

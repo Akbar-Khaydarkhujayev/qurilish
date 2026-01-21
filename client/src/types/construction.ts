@@ -2,6 +2,7 @@
 export type ConstructionStatus = {
   id: number;
   name: string;
+  sequence: number;
   createdAt?: string;
   updatedAt?: string;
   isDeleted?: boolean;

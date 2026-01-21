@@ -1,18 +1,23 @@
 import dayjs from 'dayjs';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Chip from '@mui/material/Chip';
-import Grid from '@mui/material/Grid';
+import Step from '@mui/material/Step';
 import Table from '@mui/material/Table';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Stepper from '@mui/material/Stepper';
+import Collapse from '@mui/material/Collapse';
 import TableRow from '@mui/material/TableRow';
+import StepLabel from '@mui/material/StepLabel';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import { useTheme } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -20,14 +25,18 @@ import TableContainer from '@mui/material/TableContainer';
 import LinearProgress from '@mui/material/LinearProgress';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { fNumber, fPercent } from 'src/utils/format-number';
+import { fNumber, fPercent, fShortenNumber } from 'src/utils/format-number';
 
+import { CONFIG } from 'src/config-global';
 import { useTranslate } from 'src/locales';
 
 import { Iconify } from 'src/components/iconify';
+import { SvgColor } from 'src/components/svg-color';
 import { Scrollbar } from 'src/components/scrollbar';
+import { Chart, useChart } from 'src/components/chart';
 
 import { useGetBuildingFullDetails } from './api/get-building-details';
+import { useGetConstructionStatuses } from '../settings/construction-statuses/api/get';
 
 interface DetailRowProps {
   label: string;
@@ -36,11 +45,19 @@ interface DetailRowProps {
 
 function DetailRow({ label, value }: DetailRowProps) {
   return (
-    <Box sx={{ py: 1 }}>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.25 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.75 }}>
+      <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
-      <Typography variant="body2" fontWeight={500}>
+      <Typography
+        variant="body2"
+        fontWeight={500}
+        sx={{
+          textAlign: 'right',
+          maxWidth: '60%',
+          color: label === 'Tugash sanasi' ? 'error.main' : 'text.primary',
+        }}
+      >
         {value || '-'}
       </Typography>
     </Box>
@@ -55,7 +72,27 @@ export function BuildingDetailsView() {
 
   const buildingId = id ? parseInt(id, 10) : null;
   const { data: details, isLoading, error } = useGetBuildingFullDetails(buildingId);
-  console.log(details);
+  const { data: constructionStatuses } = useGetConstructionStatuses({ page: 1, limit: 999 });
+
+  // Expandable state for sub-objects
+  const [expandedSubObjects, setExpandedSubObjects] = useState<number[]>([]);
+  // Expandable state for contracts
+  const [expandedContracts, setExpandedContracts] = useState<number[]>([]);
+
+  const toggleSubObject = (subObjectId: number) => {
+    setExpandedSubObjects((prev) =>
+      prev.includes(subObjectId)
+        ? prev.filter((item) => item !== subObjectId)
+        : [...prev, subObjectId]
+    );
+  };
+
+  const toggleContract = (contractId: number) => {
+    setExpandedContracts((prev) =>
+      prev.includes(contractId) ? prev.filter((item) => item !== contractId) : [...prev, contractId]
+    );
+  };
+
   if (isLoading) {
     return (
       <Box
@@ -88,6 +125,35 @@ export function BuildingDetailsView() {
 
   const { building } = details;
 
+  // Sort construction statuses by sequence
+  const sortedStatuses = constructionStatuses?.data
+    ? [...constructionStatuses.data].sort((a, b) => a.sequence - b.sequence)
+    : [];
+
+  // Determine current stage based on construction_status_id
+  const getCurrentStage = () => {
+    if (!building.construction_status_id || sortedStatuses.length === 0) return 0;
+    const index = sortedStatuses.findIndex((s) => s.id === building.construction_status_id);
+    return index >= 0 ? index : 0;
+  };
+
+  // Calculate overall completion percentage from sub-objects
+  const overallCompletionPct =
+    details.subObjects && details.subObjects.length > 0
+      ? details.subObjects.reduce((sum, obj) => sum + (obj.completion_percentage || 0), 0) /
+        details.subObjects.length
+      : 0;
+
+  // Get expenses, invoices, estimates for a specific contract
+  const getContractExpenses = (contractId: number) =>
+    details.expenses?.expenses?.filter((e) => e.object_contract_id === contractId) || [];
+
+  const getContractInvoices = (contractId: number) =>
+    details.invoices?.invoices?.filter((i) => i.object_contract_id === contractId) || [];
+
+  const getContractEstimates = (contractId: number) =>
+    details.estimates?.filter((e) => e.object_contract_id === contractId) || [];
+
   return (
     <Box>
       {/* Header */}
@@ -114,100 +180,133 @@ export function BuildingDetailsView() {
               )}
               color={building.building_type === 'new_building' ? 'primary' : 'warning'}
             />
-            {building.status_name && (
-              <Chip size="small" label={building.status_name} color="info" variant="outlined" />
-            )}
           </Box>
         </Box>
       </Box>
 
-      {/* Construction Cost Highlight */}
-      <Box
-        sx={{
-          p: 3,
-          mb: 3,
-          borderRadius: 2,
-          bgcolor: theme.palette.primary.lighter,
-          border: `1px solid ${theme.palette.primary.light}`,
-        }}
-      >
-        <Typography variant="subtitle1" color="primary.dark" gutterBottom>
-          {t('Construction Cost')}
-        </Typography>
-        <Typography variant="h3" color="primary.main">
-          {building.construction_cost ? fNumber(building.construction_cost) : '-'}
-        </Typography>
+      {/* Top Row: Stage Stepper + Progress + Construction Cost */}
+      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+        {/* Stage Stepper Card */}
+        <Card sx={{ flex: 2 }}>
+          <CardHeader
+            title={t('Loyiha qaysi bosqichda')}
+            titleTypographyProps={{ variant: 'subtitle1' }}
+            avatar={<Iconify icon="mdi:flag-checkered" width={24} color="primary.main" />}
+          />
+          <CardContent>
+            <Stepper activeStep={getCurrentStage()} alternativeLabel>
+              {sortedStatuses.map((status) => (
+                <Step key={status.id}>
+                  <StepLabel>{status.name}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </CardContent>
+        </Card>
+
+        {/* Bajarilgan ishlar Progress Card */}
+        <CompletionWidget
+          title={t('Bajarilgan ishlar')}
+          percent={overallCompletionPct}
+          icon="mdi:clipboard-check-outline"
+        />
+
+        {/* Construction Cost Card */}
+        <Card
+          sx={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            display: 'flex',
+          }}
+        >
+          <CardContent sx={{ textAlign: 'center', py: 3 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              {t('Construction Cost')}
+            </Typography>
+            <Typography variant="h3" color="primary.main">
+              {building.construction_cost ? fNumber(building.construction_cost) : '-'}
+            </Typography>
+          </CardContent>
+        </Card>
       </Box>
 
-      {/* Building Details */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardHeader
-              title={t('Location')}
-              titleTypographyProps={{ variant: 'subtitle1' }}
-              avatar={<Iconify icon="mdi:map-marker" width={24} color="primary.main" />}
+      {/* Main Info Cards Row */}
+      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+        {/* Obyekt haqida Card */}
+        <Card sx={{ flex: 1 }}>
+          <CardHeader
+            title={t('Obyekt haqida')}
+            titleTypographyProps={{ variant: 'subtitle1' }}
+            avatar={<Iconify icon="mdi:information" width={24} color="info.main" />}
+          />
+          <CardContent>
+            <DetailRow label={t('Obyekt nomi')} value={building.object_name} />
+            <DetailRow
+              label={t('Joylashuv')}
+              value={[building.region_name, building.district_name].filter(Boolean).join(', ')}
             />
-            <CardContent>
-              <DetailRow label={t('Region')} value={building.region_name} />
-              <DetailRow label={t('District')} value={building.district_name} />
-              <DetailRow label={t('Address')} value={building.address} />
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardHeader
-              title={t('Organization')}
-              titleTypographyProps={{ variant: 'subtitle1' }}
-              avatar={<Iconify icon="mdi:domain" width={24} color="info.main" />}
+            <DetailRow label={t('Manzil')} value={building.address} />
+            <DetailRow label={t('Qurilish uchun asos')} value={building.construction_basis} />
+            <DetailRow
+              label={t('Boshlanish sanasi')}
+              value={
+                building.construction_start_date
+                  ? dayjs(building.construction_start_date).format('DD.MM.YYYY')
+                  : null
+              }
             />
-            <CardContent>
-              <DetailRow label={t('Organization')} value={building.organization_name} />
-              <DetailRow
-                label={t('Project Organization')}
-                value={building.project_organization_name}
-              />
-              <DetailRow label={t('Contractor')} value={building.contractor_name} />
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: '100%' }}>
-            <CardHeader
-              title={t('Construction')}
-              titleTypographyProps={{ variant: 'subtitle1' }}
-              avatar={<Iconify icon="mdi:construction" width={24} color="warning.main" />}
+            <DetailRow
+              label={t('Tugash sanasi')}
+              value={
+                building.construction_end_date
+                  ? dayjs(building.construction_end_date).format('DD.MM.YYYY')
+                  : null
+              }
             />
-            <CardContent>
-              <DetailRow label={t('Construction Status')} value={building.status_name} />
-              <DetailRow label={t('Construction Basis')} value={building.construction_basis} />
-              <DetailRow
-                label={t('Construction Start Date')}
-                value={
-                  building.construction_start_date
-                    ? dayjs(building.construction_start_date).format('DD.MM.YYYY')
-                    : null
-                }
-              />
-              <DetailRow
-                label={t('Construction End Date')}
-                value={
-                  building.construction_end_date
-                    ? dayjs(building.construction_end_date).format('DD.MM.YYYY')
-                    : null
-                }
-              />
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            <DetailRow
+              label={t('Ish qiymati')}
+              value={building.construction_cost ? fNumber(building.construction_cost) : null}
+            />
+            <DetailRow label={t('Texnik nazoratchi')} value={building.technical_supervisor_name} />
+          </CardContent>
+        </Card>
 
-      {/* Sub Objects */}
+        {/* Pudratchi haqida Card */}
+        <Card sx={{ flex: 1 }}>
+          <CardHeader
+            title={t('Pudratchi haqida')}
+            titleTypographyProps={{ variant: 'subtitle1' }}
+            avatar={<Iconify icon="mdi:account-hard-hat" width={24} color="warning.main" />}
+          />
+          <CardContent>
+            <DetailRow label={t('Tashkilot nomi')} value={building.contractor_name} />
+            <DetailRow label={t('STIR')} value={building.contractor_tax_id} />
+            <DetailRow label={t('Manzil')} value={building.contractor_address} />
+            <DetailRow label={t('Telefon')} value={building.contractor_phone} />
+          </CardContent>
+        </Card>
+
+        {/* Loyiha tashkiloti haqida Card */}
+        <Card sx={{ flex: 1 }}>
+          <CardHeader
+            title={t('Loyiha tashkiloti haqida')}
+            titleTypographyProps={{ variant: 'subtitle1' }}
+            avatar={<Iconify icon="mdi:office-building" width={24} color="primary.main" />}
+          />
+          <CardContent>
+            <DetailRow label={t('Tashkilot nomi')} value={building.project_organization_name} />
+            <DetailRow label={t('STIR')} value={building.project_org_tax_id} />
+            <DetailRow label={t('Manzil')} value={building.project_org_address} />
+            <DetailRow label={t('Telefon')} value={building.project_org_phone} />
+          </CardContent>
+        </Card>
+      </Box>
+
+      {/* Sub Objects with expandable items */}
       <Card sx={{ mb: 3 }}>
         <CardHeader
+          sx={{ mb: 2 }}
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {t('Sub Objects')}
@@ -216,30 +315,55 @@ export function BuildingDetailsView() {
           }
           avatar={<Iconify icon="mdi:folder-multiple" width={24} color="primary.main" />}
         />
-        <CardContent>
+        <CardContent sx={{ p: 0 }}>
           {details.subObjects && details.subObjects.length > 0 ? (
-            <Scrollbar sx={{ maxHeight: 300 }}>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('Name')}</TableCell>
-                      <TableCell>{t('Deadline')}</TableCell>
-                      <TableCell align="right">{t('Cost')}</TableCell>
-                      <TableCell>{t('Completion %')}</TableCell>
-                      <TableCell align="center">{t('Construction Items')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {details.subObjects.map((subObj) => (
-                      <TableRow key={subObj.id}>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell width={50} />
+                    <TableCell>{t('Name')}</TableCell>
+                    <TableCell>{t('Deadline')}</TableCell>
+                    <TableCell align="right">{t('Cost')}</TableCell>
+                    <TableCell>{t('Completion %')}</TableCell>
+                    <TableCell align="center">{t('Items')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {details.subObjects.map((subObj) => (
+                    <>
+                      <TableRow
+                        key={subObj.id}
+                        hover
+                        sx={{ cursor: subObj.items_count > 0 ? 'pointer' : 'default' }}
+                        onClick={() => subObj.items_count > 0 && toggleSubObject(subObj.id)}
+                      >
+                        <TableCell>
+                          {subObj.items_count > 0 && (
+                            <IconButton size="small">
+                              <Iconify
+                                icon={
+                                  expandedSubObjects.includes(subObj.id)
+                                    ? 'mdi:chevron-down'
+                                    : 'mdi:chevron-right'
+                                }
+                                width={20}
+                              />
+                            </IconButton>
+                          )}
+                        </TableCell>
                         <TableCell>
                           <Typography variant="body2" fontWeight={500}>
                             {subObj.name}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          {subObj.deadline ? dayjs(subObj.deadline).format('DD.MM.YYYY') : '-'}
+                          <Typography
+                            variant="body2"
+                            sx={{ color: subObj.deadline ? 'error.main' : 'text.secondary' }}
+                          >
+                            {subObj.deadline ? dayjs(subObj.deadline).format('DD.MM.YYYY') : '-'}
+                          </Typography>
                         </TableCell>
                         <TableCell align="right">
                           {subObj.cost ? fNumber(subObj.cost) : '-'}
@@ -267,22 +391,35 @@ export function BuildingDetailsView() {
                           <Chip size="small" label={subObj.items_count || 0} />
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Scrollbar>
+                      {/* Expanded items row */}
+                      <TableRow>
+                        <TableCell colSpan={6} sx={{ py: 0, border: 0 }}>
+                          <Collapse
+                            in={expandedSubObjects.includes(subObj.id)}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <SubObjectItems subObjectId={subObj.id} />
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           ) : (
-            <Typography color="text.secondary" textAlign="center" py={2}>
+            <Typography color="text.secondary" textAlign="center" py={3}>
               {t('No data available')}
             </Typography>
           )}
         </CardContent>
       </Card>
 
-      {/* Contracts */}
+      {/* Contracts with expandable expenses/invoices/estimates */}
       <Card sx={{ mb: 3 }}>
         <CardHeader
+          sx={{ mb: 2 }}
           title={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {t('Contracts')}
@@ -291,186 +428,93 @@ export function BuildingDetailsView() {
           }
           avatar={<Iconify icon="mdi:file-document" width={24} color="info.main" />}
         />
-        <CardContent>
+        <CardContent sx={{ p: 0 }}>
           {details.contracts && details.contracts.length > 0 ? (
-            <Scrollbar sx={{ maxHeight: 300 }}>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('Contract Number')}</TableCell>
-                      <TableCell>{t('Contract Date')}</TableCell>
-                      <TableCell align="right">{t('Contract Amount')}</TableCell>
-                      <TableCell>{t('Stage')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {details.contracts.map((contract) => (
-                      <TableRow key={contract.id}>
-                        <TableCell>
-                          <Typography variant="body2" fontWeight={500}>
-                            {contract.contract_number || '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          {contract.contract_date
-                            ? dayjs(contract.contract_date).format('DD.MM.YYYY')
-                            : '-'}
-                        </TableCell>
-                        <TableCell align="right">
-                          {contract.contract_amount ? fNumber(contract.contract_amount) : '-'}
-                        </TableCell>
-                        <TableCell>{contract.stage || '-'}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Scrollbar>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell width={50} />
+                    <TableCell>{t('Contract Number')}</TableCell>
+                    <TableCell>{t('Contract Date')}</TableCell>
+                    <TableCell align="right">{t('Contract Amount')}</TableCell>
+                    <TableCell>{t('Stage')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {details.contracts.map((contract) => {
+                    const expenses = getContractExpenses(contract.id);
+                    const invoices = getContractInvoices(contract.id);
+                    const estimates = getContractEstimates(contract.id);
+                    const hasRelatedData =
+                      expenses.length > 0 || invoices.length > 0 || estimates.length > 0;
+
+                    return (
+                      <>
+                        <TableRow
+                          key={contract.id}
+                          hover
+                          sx={{ cursor: hasRelatedData ? 'pointer' : 'default' }}
+                          onClick={() => hasRelatedData && toggleContract(contract.id)}
+                        >
+                          <TableCell>
+                            {hasRelatedData && (
+                              <IconButton size="small">
+                                <Iconify
+                                  icon={
+                                    expandedContracts.includes(contract.id)
+                                      ? 'mdi:chevron-down'
+                                      : 'mdi:chevron-right'
+                                  }
+                                  width={20}
+                                />
+                              </IconButton>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight={500}>
+                              {contract.contract_number || '-'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            {contract.contract_date
+                              ? dayjs(contract.contract_date).format('DD.MM.YYYY')
+                              : '-'}
+                          </TableCell>
+                          <TableCell align="right">
+                            {contract.contract_amount ? fNumber(contract.contract_amount) : '-'}
+                          </TableCell>
+                          <TableCell>{contract.stage || '-'}</TableCell>
+                        </TableRow>
+                        {/* Expanded contract details row */}
+                        <TableRow>
+                          <TableCell colSpan={5} sx={{ py: 0, border: 0 }}>
+                            <Collapse
+                              in={expandedContracts.includes(contract.id)}
+                              timeout="auto"
+                              unmountOnExit
+                            >
+                              <ContractDetails
+                                expenses={expenses}
+                                invoices={invoices}
+                                estimates={estimates}
+                              />
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
           ) : (
-            <Typography color="text.secondary" textAlign="center" py={2}>
+            <Typography color="text.secondary" textAlign="center" py={3}>
               {t('No data available')}
             </Typography>
           )}
         </CardContent>
       </Card>
-
-      {/* Financial Summary Row */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
-        {/* Bank Expenses */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardHeader
-              title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {t('Bank Expenses')}
-                  <Chip size="small" label={details.expenses?.count || 0} />
-                </Box>
-              }
-              avatar={<Iconify icon="mdi:bank-transfer-out" width={24} color="error.main" />}
-            />
-            <CardContent>
-              <Box
-                sx={{
-                  p: 2,
-                  mb: 2,
-                  borderRadius: 1,
-                  bgcolor: theme.palette.error.lighter,
-                  textAlign: 'center',
-                }}
-              >
-                <Typography variant="subtitle2" color="error.dark">
-                  {t('Total Expenses')}
-                </Typography>
-                <Typography variant="h5" color="error.main">
-                  {fNumber(details.expenses?.totalAmount || 0)}
-                </Typography>
-              </Box>
-              {details.expenses?.expenses && details.expenses.expenses.length > 0 ? (
-                <Scrollbar sx={{ maxHeight: 200 }}>
-                  <TableContainer>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>{t('Registry Number')}</TableCell>
-                          <TableCell>{t('Registry Date')}</TableCell>
-                          <TableCell align="right">{t('Amount')}</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {details.expenses.expenses.slice(0, 5).map((expense) => (
-                          <TableRow key={expense.id}>
-                            <TableCell>{expense.registry_number || '-'}</TableCell>
-                            <TableCell>
-                              {expense.registry_date
-                                ? dayjs(expense.registry_date).format('DD.MM.YYYY')
-                                : '-'}
-                            </TableCell>
-                            <TableCell align="right">
-                              {expense.amount ? fNumber(expense.amount) : '-'}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Scrollbar>
-              ) : (
-                <Typography color="text.secondary" textAlign="center" py={2}>
-                  {t('No data available')}
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Invoices */}
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: '100%' }}>
-            <CardHeader
-              title={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {t('Invoices')}
-                  <Chip size="small" label={details.invoices?.count || 0} />
-                </Box>
-              }
-              avatar={<Iconify icon="mdi:receipt" width={24} color="success.main" />}
-            />
-            <CardContent>
-              <Box
-                sx={{
-                  p: 2,
-                  mb: 2,
-                  borderRadius: 1,
-                  bgcolor: theme.palette.success.lighter,
-                  textAlign: 'center',
-                }}
-              >
-                <Typography variant="subtitle2" color="success.dark">
-                  {t('Total Invoices')}
-                </Typography>
-                <Typography variant="h5" color="success.main">
-                  {fNumber(details.invoices?.totalAmount || 0)}
-                </Typography>
-              </Box>
-              {details.invoices?.invoices && details.invoices.invoices.length > 0 ? (
-                <Scrollbar sx={{ maxHeight: 200 }}>
-                  <TableContainer>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>{t('Document Number')}</TableCell>
-                          <TableCell>{t('Document Date')}</TableCell>
-                          <TableCell align="right">{t('Amount')}</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {details.invoices.invoices.slice(0, 5).map((invoice) => (
-                          <TableRow key={invoice.id}>
-                            <TableCell>{invoice.document_number || '-'}</TableCell>
-                            <TableCell>
-                              {invoice.document_date
-                                ? dayjs(invoice.document_date).format('DD.MM.YYYY')
-                                : '-'}
-                            </TableCell>
-                            <TableCell align="right">
-                              {invoice.amount ? fNumber(invoice.amount) : '-'}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Scrollbar>
-              ) : (
-                <Typography color="text.secondary" textAlign="center" py={2}>
-                  {t('No data available')}
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
 
       {/* Files */}
       <Card>
@@ -566,6 +610,268 @@ export function BuildingDetailsView() {
           )}
         </CardContent>
       </Card>
+    </Box>
+  );
+}
+
+// Sub-component for sub-object items
+function SubObjectItems({ subObjectId }: { subObjectId: number }) {
+  const { t } = useTranslate();
+  const theme = useTheme();
+
+  // For now, we'll show a placeholder. In production, you'd fetch items here
+  // using useGetSubObjectItems(subObjectId)
+  return (
+    <Box sx={{ py: 2, px: 4, bgcolor: theme.palette.background.neutral }}>
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+        {t('Construction Items')}
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {t('Items will be loaded here for sub-object')} #{subObjectId}
+      </Typography>
+    </Box>
+  );
+}
+
+// Sub-component for contract details (expenses, invoices, estimates)
+function ContractDetails({
+  expenses,
+  invoices,
+  estimates,
+}: {
+  expenses: any[];
+  invoices: any[];
+  estimates: any[];
+}) {
+  const { t } = useTranslate();
+  const theme = useTheme();
+
+  return (
+    <Box sx={{ py: 2, px: 2, bgcolor: theme.palette.background.neutral }}>
+      <Box sx={{ display: 'flex', gap: 3 }}>
+        {/* Expenses */}
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="subtitle2" color="error.main" sx={{ mb: 1 }}>
+            <Iconify
+              icon="mdi:bank-transfer-out"
+              width={18}
+              sx={{ mr: 0.5, verticalAlign: 'middle' }}
+            />
+            {t('Bank Expenses')} ({expenses.length})
+          </Typography>
+          {expenses.length > 0 ? (
+            <Scrollbar sx={{ maxHeight: 150 }}>
+              {expenses.map((expense) => (
+                <Box
+                  key={expense.id}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    py: 0.5,
+                    borderBottom: `1px dashed ${theme.palette.divider}`,
+                  }}
+                >
+                  <Typography variant="caption">
+                    {expense.registry_number || '-'} (
+                    {expense.registry_date ? dayjs(expense.registry_date).format('DD.MM.YY') : '-'})
+                  </Typography>
+                  <Typography variant="caption" fontWeight={600} color="error.main">
+                    {expense.amount ? fShortenNumber(expense.amount) : '-'}
+                  </Typography>
+                </Box>
+              ))}
+            </Scrollbar>
+          ) : (
+            <Typography variant="caption" color="text.disabled">
+              {t('No data')}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Invoices */}
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="subtitle2" color="success.main" sx={{ mb: 1 }}>
+            <Iconify icon="mdi:receipt" width={18} sx={{ mr: 0.5, verticalAlign: 'middle' }} />
+            {t('Invoices')} ({invoices.length})
+          </Typography>
+          {invoices.length > 0 ? (
+            <Scrollbar sx={{ maxHeight: 150 }}>
+              {invoices.map((invoice) => (
+                <Box
+                  key={invoice.id}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    py: 0.5,
+                    borderBottom: `1px dashed ${theme.palette.divider}`,
+                  }}
+                >
+                  <Typography variant="caption">
+                    {invoice.document_number || '-'} (
+                    {invoice.document_date ? dayjs(invoice.document_date).format('DD.MM.YY') : '-'})
+                  </Typography>
+                  <Typography variant="caption" fontWeight={600} color="success.main">
+                    {invoice.amount ? fShortenNumber(invoice.amount) : '-'}
+                  </Typography>
+                </Box>
+              ))}
+            </Scrollbar>
+          ) : (
+            <Typography variant="caption" color="text.disabled">
+              {t('No data')}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Estimates */}
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="subtitle2" color="info.main" sx={{ mb: 1 }}>
+            <Iconify icon="mdi:calculator" width={18} sx={{ mr: 0.5, verticalAlign: 'middle' }} />
+            {t('Estimates')} ({estimates.length})
+          </Typography>
+          {estimates.length > 0 ? (
+            <Scrollbar sx={{ maxHeight: 150 }}>
+              {estimates.map((estimate) => (
+                <Box
+                  key={estimate.id}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    py: 0.5,
+                    borderBottom: `1px dashed ${theme.palette.divider}`,
+                  }}
+                >
+                  <Typography variant="caption">{estimate.year}</Typography>
+                  <Typography variant="caption" fontWeight={600} color="info.main">
+                    {estimate.year_total ? fShortenNumber(estimate.year_total) : '-'}
+                  </Typography>
+                </Box>
+              ))}
+            </Scrollbar>
+          ) : (
+            <Typography variant="caption" color="text.disabled">
+              {t('No data')}
+            </Typography>
+          )}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+// Completion Widget with radial chart
+function CompletionWidget({
+  title,
+  percent,
+  icon,
+}: {
+  title: string;
+  percent: number;
+  icon: string;
+}) {
+  const theme = useTheme();
+
+  const getChartColors = (pct: number): [string, string] => {
+    if (pct >= 80) return [theme.palette.success.light, theme.palette.success.main];
+    if (pct >= 50) return [theme.palette.primary.light, theme.palette.primary.main];
+    if (pct >= 25) return [theme.palette.warning.light, theme.palette.warning.main];
+    return [theme.palette.error.light, theme.palette.error.main];
+  };
+
+  const getBgColor = (pct: number) => {
+    if (pct >= 80) return 'success.dark';
+    if (pct >= 50) return 'primary.dark';
+    if (pct >= 25) return 'warning.dark';
+    return 'error.dark';
+  };
+
+  const chartColors = getChartColors(percent);
+
+  const chartOptions = useChart({
+    chart: { sparkline: { enabled: true } },
+    stroke: { width: 0 },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        colorStops: [
+          { offset: 0, color: chartColors[0], opacity: 1 },
+          { offset: 100, color: chartColors[1], opacity: 1 },
+        ],
+      },
+    },
+    plotOptions: {
+      radialBar: {
+        dataLabels: {
+          name: { show: false },
+          value: {
+            offsetY: 6,
+            color: theme.palette.common.white,
+            fontSize: theme.typography.subtitle2.fontSize as string,
+          },
+        },
+      },
+    },
+  });
+
+  return (
+    <Box
+      sx={{
+        p: 3,
+        gap: 3,
+        flex: 1,
+        borderRadius: 2,
+        display: 'flex',
+        overflow: 'hidden',
+        position: 'relative',
+        alignItems: 'center',
+        color: 'common.white',
+        bgcolor: getBgColor(percent),
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          position: 'relative',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Chart
+          type="radialBar"
+          series={[percent]}
+          options={chartOptions}
+          width={80}
+          height={80}
+          sx={{ zIndex: 1 }}
+        />
+
+        <SvgColor
+          src={`${CONFIG.site.basePath}/assets/background/shape-circle-3.svg`}
+          sx={{
+            width: 200,
+            height: 200,
+            opacity: 0.08,
+            position: 'absolute',
+            color: 'primary.light',
+          }}
+        />
+      </Box>
+
+      <div>
+        <Box sx={{ typography: 'h4' }}>{fPercent(percent)}</Box>
+        <Box sx={{ typography: 'subtitle2', opacity: 0.64 }}>{title}</Box>
+      </div>
+
+      <Iconify
+        icon={icon}
+        sx={{
+          width: 120,
+          right: -40,
+          height: 120,
+          opacity: 0.08,
+          position: 'absolute',
+        }}
+      />
     </Box>
   );
 }

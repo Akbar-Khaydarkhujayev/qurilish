@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -71,7 +71,7 @@ export function BuildingsTable({ buildings, filter, selectedRegionId, onBuilding
   }, [buildings, filter, selectedRegionId, search]);
 
   // Reset page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setPage(1);
   }, [filter, selectedRegionId, search]);
 

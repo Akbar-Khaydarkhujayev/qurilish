@@ -1,9 +1,14 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Box from '@mui/material/Box';
+import Step from '@mui/material/Step';
+import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
+import Stepper from '@mui/material/Stepper';
 import TableBody from '@mui/material/TableBody';
+import StepLabel from '@mui/material/StepLabel';
 import { Button, Typography } from '@mui/material';
+import CardContent from '@mui/material/CardContent';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useDebounce } from 'src/hooks/use-debounce';
@@ -21,7 +26,7 @@ import { useDeleteConstructionStatus } from './api/delete';
 import { ConstructionStatusDialog } from './components/dialog';
 import { ConstructionStatusRowItem } from './components/row-item';
 
-const headLabels = ['Name', 'Created at', ''];
+const headLabels = ['Tartib', 'Name', 'Created at', ''];
 
 export default function ConstructionStatusesView() {
   const { t } = useTranslate();
@@ -41,6 +46,15 @@ export default function ConstructionStatusesView() {
     limit,
     search,
   });
+
+  // Get all statuses for stepper preview (without pagination)
+  const { data: allStatuses } = useGetConstructionStatuses({ page: 1, limit: 999 });
+
+  // Sort statuses by sequence for stepper
+  const sortedStatuses = useMemo(() => {
+    if (!allStatuses?.data) return [];
+    return [...allStatuses.data].sort((a, b) => a.sequence - b.sequence);
+  }, [allStatuses]);
 
   return (
     <>
@@ -75,6 +89,35 @@ export default function ConstructionStatusesView() {
           </Box>
         </Box>
 
+        {/* Stepper Preview Card */}
+        {sortedStatuses.length > 0 && (
+          <Card sx={{ mb: 2 }}>
+            <CardContent>
+              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
+                {t("Stepper ko'rinishi")} ({t("Building details page'da shunday ko'rinadi")}):
+              </Typography>
+              <Stepper activeStep={1} alternativeLabel>
+                {sortedStatuses.map((status) => (
+                  <Step key={status.id}>
+                    <StepLabel>
+                      <Box>
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
+                          sx={{ display: 'block' }}
+                        >
+                          #{status.sequence}
+                        </Typography>
+                        {status.name}
+                      </Box>
+                    </StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            </CardContent>
+          </Card>
+        )}
+
         <Box
           sx={{
             border: '1px solid',
@@ -84,13 +127,14 @@ export default function ConstructionStatusesView() {
             bgcolor: 'background.paper',
           }}
         >
-          <Scrollbar sx={{ height: 'calc(100vh - 230px)' }}>
+          <Scrollbar sx={{ height: 'calc(100vh - 400px)' }}>
             <Table size="small" stickyHeader>
               <TableHeadCustom
                 headLabel={headLabels.map((label) => ({
                   id: label,
-                  label,
-                  align: label === 'Actions' ? 'right' : 'left',
+                  label: t(label),
+                  align: label === '' ? 'right' : 'left',
+                  width: label === 'Tartib' ? 80 : undefined,
                 }))}
               />
 
@@ -107,7 +151,7 @@ export default function ConstructionStatusesView() {
                   />
                 ))}
 
-                <TableNoData notFound={!data?.meta.total} sx={{ height: 'calc(100vh - 290px)' }} />
+                <TableNoData notFound={!data?.meta.total} sx={{ height: 'calc(100vh - 390px)' }} />
               </TableBody>
             </Table>
           </Scrollbar>

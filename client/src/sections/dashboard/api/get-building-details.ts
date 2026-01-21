@@ -27,10 +27,19 @@ export interface IBuildingDetails {
   status_name: string | null;
   contractor_id: number | null;
   contractor_name: string | null;
+  contractor_tax_id: string | null;
+  contractor_address: string | null;
+  contractor_phone: string | null;
   organization_id: number | null;
   organization_name: string | null;
   project_organization_id: number | null;
   project_organization_name: string | null;
+  project_org_tax_id: string | null;
+  project_org_address: string | null;
+  project_org_phone: string | null;
+  technical_supervisor_id: number | null;
+  technical_supervisor_name: string | null;
+  technical_supervisor_email: string | null;
   created_at: string;
 }
 

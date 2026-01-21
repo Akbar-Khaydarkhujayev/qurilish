@@ -1,19 +1,16 @@
-import { Response } from 'express';
-import pool from '../config/database';
-import { AuthRequest } from '../types';
-import * as responseFormatter from '../utils/responseFormatter';
+import { Response } from "express";
+import pool from "../config/database";
+import { AuthRequest } from "../types";
+import * as responseFormatter from "../utils/responseFormatter";
 
-export const getStatistics = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getStatistics = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
   try {
     const currentUser = req.user;
     if (!currentUser) {
       responseFormatter.unauthorized(res);
-      return;
-    }
-
-    // Only super_admin can access dashboard statistics
-    if (currentUser.role !== 'super_admin') {
-      responseFormatter.forbidden(res, 'Only super admins can access dashboard statistics');
       return;
     }
 
@@ -151,20 +148,24 @@ export const getStatistics = async (req: AuthRequest, res: Response): Promise<vo
     const statistics = {
       overall: {
         totalBuildings: parseInt(overallStats.rows[0].total_buildings),
-        totalConstructionCost: parseFloat(overallStats.rows[0].total_construction_cost),
+        totalConstructionCost: parseFloat(
+          overallStats.rows[0].total_construction_cost,
+        ),
         newBuildingsCount: parseInt(overallStats.rows[0].new_buildings_count),
         renovationCount: parseInt(overallStats.rows[0].renovation_count),
         overdueCount: parseInt(overallStats.rows[0].overdue_count),
         totalContracts: parseInt(contractsStats.rows[0].total_contracts),
-        totalContractAmount: parseFloat(contractsStats.rows[0].total_contract_amount),
+        totalContractAmount: parseFloat(
+          contractsStats.rows[0].total_contract_amount,
+        ),
       },
-      byStatus: statusStats.rows.map(row => ({
+      byStatus: statusStats.rows.map((row) => ({
         id: row.id,
         statusName: row.status_name,
         buildingCount: parseInt(row.building_count),
         totalCost: parseFloat(row.total_cost),
       })),
-      byRegion: regionStats.rows.map(row => ({
+      byRegion: regionStats.rows.map((row) => ({
         id: row.id,
         regionName: row.region_name,
         buildingCount: parseInt(row.building_count),
@@ -174,11 +175,13 @@ export const getStatistics = async (req: AuthRequest, res: Response): Promise<vo
       })),
       financial: {
         totalBudget: parseFloat(financialStats.rows[0].total_budget),
-        totalContractAmount: parseFloat(financialStats.rows[0].total_contract_amount),
+        totalContractAmount: parseFloat(
+          financialStats.rows[0].total_contract_amount,
+        ),
         totalExpenses: parseFloat(financialStats.rows[0].total_expenses),
         totalInvoices: parseFloat(financialStats.rows[0].total_invoices),
       },
-      buildings: allBuildings.rows.map(row => ({
+      buildings: allBuildings.rows.map((row) => ({
         id: row.id,
         objectName: row.object_name,
         cardNumber: row.card_number,
@@ -196,18 +199,18 @@ export const getStatistics = async (req: AuthRequest, res: Response): Promise<vo
         isOverdue: row.is_overdue,
         createdAt: row.created_at,
       })),
-      monthlyStats: monthlyStats.rows.map(row => ({
+      monthlyStats: monthlyStats.rows.map((row) => ({
         month: parseInt(row.month),
         buildingCount: parseInt(row.building_count),
         totalCost: parseFloat(row.total_cost),
       })),
-      contractors: allContractors.rows.map(row => ({
+      contractors: allContractors.rows.map((row) => ({
         id: row.id,
         contractorName: row.contractor_name,
         buildingCount: parseInt(row.building_count),
         totalCost: parseFloat(row.total_cost),
       })),
-      organizations: allOrganizations.rows.map(row => ({
+      organizations: allOrganizations.rows.map((row) => ({
         id: row.id,
         organizationName: row.organization_name,
         buildingCount: parseInt(row.building_count),
@@ -215,9 +218,13 @@ export const getStatistics = async (req: AuthRequest, res: Response): Promise<vo
       })),
     };
 
-    responseFormatter.success(res, statistics, 'Dashboard statistics retrieved successfully');
+    responseFormatter.success(
+      res,
+      statistics,
+      "Dashboard statistics retrieved successfully",
+    );
   } catch (error) {
-    console.error('Get dashboard statistics error:', error);
-    responseFormatter.error(res, 'Error retrieving dashboard statistics');
+    console.error("Get dashboard statistics error:", error);
+    responseFormatter.error(res, "Error retrieving dashboard statistics");
   }
 };

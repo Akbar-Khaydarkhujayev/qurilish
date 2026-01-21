@@ -8,6 +8,7 @@ import axiosInstance from 'src/utils/axios';
 export interface IConstructionStatus {
   id: number;
   name: string;
+  sequence: number;
   created_at: string;
   updated_at: string;
 }
