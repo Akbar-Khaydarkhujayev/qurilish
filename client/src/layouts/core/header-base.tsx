@@ -1,9 +1,14 @@
 import type { NavSectionProps } from 'src/components/nav-section';
 
 import Box from '@mui/material/Box';
-import { styled, useTheme } from '@mui/material/styles';
+import { Switch } from '@mui/material';
+import { styled, useTheme, useColorScheme } from '@mui/material/styles';
+
+import { CONFIG } from 'src/config-global';
 
 import { Logo } from 'src/components/logo';
+import { SvgColor } from 'src/components/svg-color';
+import { useSettingsContext } from 'src/components/settings';
 import { AccountPopover } from 'src/components/popovers/account-popover';
 
 import { HeaderSection } from './header-section';
@@ -98,6 +103,10 @@ export function HeaderBase({
 }: HeaderBaseProps) {
   const theme = useTheme();
 
+  const { colorScheme, onUpdateField } = useSettingsContext();
+
+  const { mode, setMode } = useColorScheme();
+
   return (
     <HeaderSection
       sx={sx}
@@ -138,6 +147,25 @@ export function HeaderBase({
                 gap: 2,
               }}
             >
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                onClick={() => {
+                  onUpdateField('colorScheme', mode === 'light' ? 'dark' : 'light');
+                  setMode(mode === 'light' ? 'dark' : 'light');
+                }}
+              >
+                <SvgColor src={`${CONFIG.site.basePath}/assets/icons/setting/ic-moon.svg`} />
+                <Switch
+                  name="label"
+                  size="small"
+                  color="default"
+                  checked={colorScheme === 'dark'}
+                  sx={{ mr: -0.75 }}
+                />
+              </Box>
+
               {/* -- Language popover -- */}
               {localization && <LanguagePopover data-slot="localization" data={data?.langs} />}
 
