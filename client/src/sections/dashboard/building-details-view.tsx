@@ -821,12 +821,12 @@ function ContractDetails({
                     borderBottom: `1px dashed ${theme.palette.divider}`,
                   }}
                 >
+                  <Typography variant="caption" fontWeight={600} color="error.main">
+                    {expense.amount ? fShortenNumber(expense.amount) : '-'}
+                  </Typography>
                   <Typography variant="caption">
                     {expense.registry_number || '-'} (
                     {expense.registry_date ? dayjs(expense.registry_date).format('DD.MM.YY') : '-'})
-                  </Typography>
-                  <Typography variant="caption" fontWeight={600} color="error.main">
-                    {expense.amount ? fShortenNumber(expense.amount) : '-'}
                   </Typography>
                 </Box>
               ))}
@@ -856,12 +856,12 @@ function ContractDetails({
                     borderBottom: `1px dashed ${theme.palette.divider}`,
                   }}
                 >
+                  <Typography variant="caption" fontWeight={600} color="success.main">
+                    {invoice.amount ? fShortenNumber(invoice.amount) : '-'}
+                  </Typography>
                   <Typography variant="caption">
                     {invoice.document_number || '-'} (
                     {invoice.document_date ? dayjs(invoice.document_date).format('DD.MM.YY') : '-'})
-                  </Typography>
-                  <Typography variant="caption" fontWeight={600} color="success.main">
-                    {invoice.amount ? fShortenNumber(invoice.amount) : '-'}
                   </Typography>
                 </Box>
               ))}
@@ -891,10 +891,10 @@ function ContractDetails({
                     borderBottom: `1px dashed ${theme.palette.divider}`,
                   }}
                 >
-                  <Typography variant="caption">{estimate.year}</Typography>
                   <Typography variant="caption" fontWeight={600} color="info.main">
                     {estimate.year_total ? fShortenNumber(estimate.year_total) : '-'}
                   </Typography>
+                  <Typography variant="caption">{estimate.year}</Typography>
                 </Box>
               ))}
             </Scrollbar>
