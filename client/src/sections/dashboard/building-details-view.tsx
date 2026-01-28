@@ -811,7 +811,7 @@ function ContractDetails({
           </Typography>
           {expenses.length > 0 ? (
             <Scrollbar sx={{ maxHeight: 150 }}>
-              {expenses.map((expense) => (
+              {[...expenses].reverse().map((expense) => (
                 <Box
                   key={expense.id}
                   sx={{
@@ -846,7 +846,7 @@ function ContractDetails({
           </Typography>
           {invoices.length > 0 ? (
             <Scrollbar sx={{ maxHeight: 150 }}>
-              {invoices.map((invoice) => (
+              {[...invoices].reverse().map((invoice) => (
                 <Box
                   key={invoice.id}
                   sx={{
@@ -881,7 +881,7 @@ function ContractDetails({
           </Typography>
           {estimates.length > 0 ? (
             <Scrollbar sx={{ maxHeight: 150 }}>
-              {estimates.map((estimate) => (
+              {[...estimates].reverse().map((estimate) => (
                 <Box
                   key={estimate.id}
                   sx={{
