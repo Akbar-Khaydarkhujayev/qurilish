@@ -40,6 +40,18 @@ export interface IBuildingDetails {
   technical_supervisor_id: number | null;
   technical_supervisor_name: string | null;
   technical_supervisor_email: string | null;
+  camera_login: string | null;
+  camera_password: string | null;
+  camera_ip: string | null;
+  created_at: string;
+}
+
+export interface IBuildingImage {
+  id: number;
+  object_card_id: number;
+  path: string;
+  file_name: string;
+  sort_order: number;
   created_at: string;
 }
 
@@ -51,6 +63,7 @@ export interface IBuildingFullDetails {
   expenses: { expenses: IExpense[]; totalAmount: number; count: number };
   invoices: { invoices: IInvoice[]; totalAmount: number; count: number };
   files: { files: IFile[]; count: number };
+  images: IBuildingImage[];
 }
 
 const getBuildingFullDetails = async (id: number): Promise<IBuildingFullDetails> => {
@@ -62,6 +75,7 @@ const getBuildingFullDetails = async (id: number): Promise<IBuildingFullDetails>
     expensesRes,
     invoicesRes,
     filesRes,
+    imagesRes,
   ] = await Promise.all([
     axiosInstance.get(`/object-cards/${id}`),
     axiosInstance.get(`/object-cards/${id}/sub-objects`),
@@ -70,6 +84,7 @@ const getBuildingFullDetails = async (id: number): Promise<IBuildingFullDetails>
     axiosInstance.get(`/object-cards/${id}/expenses`),
     axiosInstance.get(`/object-cards/${id}/invoices`),
     axiosInstance.get(`/object-cards/${id}/files`),
+    axiosInstance.get(`/object-cards/${id}/images`),
   ]);
 
   return {
@@ -113,6 +128,7 @@ const getBuildingFullDetails = async (id: number): Promise<IBuildingFullDetails>
       })),
     },
     files: filesRes.data.data,
+    images: imagesRes.data.data || [],
   };
 };
 

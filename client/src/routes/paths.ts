@@ -19,6 +19,7 @@ export const paths = {
   dashboard: {
     root: ROOTS.DASHBOARD,
   },
+  dashboard1: '/dashboard1',
   buildings: ROOTS.BUILDINGS,
   settings: {
     self: ROOTS.SETTINGS,

@@ -31,6 +31,9 @@ export interface IBuilding {
   building_type: 'new_building' | 'major_renovation';
   created_at: string;
   updated_at: string;
+  camera_login: string;
+  camera_password: string;
+  camera_ip: string;
 }
 
 export interface IBuildingParams extends IReqParams {

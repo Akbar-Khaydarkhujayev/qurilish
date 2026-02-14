@@ -46,7 +46,7 @@ export function SignInView() {
 
   const defaultValues = {
     username: 'superadmin',
-    password: 'admin123',
+    password: '123',
   };
 
   const methods = useForm<SignInSchemaType>({

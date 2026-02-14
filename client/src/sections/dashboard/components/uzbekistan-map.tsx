@@ -182,7 +182,17 @@ export function UzbekistanMap({
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', ...sx }}>
-      <CardHeader title={t('Buildings by Region')} sx={{ flexShrink: 0 }} />
+      <CardHeader
+        title={t('Buildings by Region')}
+        sx={{
+          flexShrink: 0,
+          '& .MuiCardHeader-title': {
+            mt: -1,
+            fontSize: 24,
+            fontWeight: 600,
+          },
+        }}
+      />
       <Box
         sx={{
           p: 2,
@@ -228,33 +238,33 @@ export function UzbekistanMap({
                   color: 'primary.contrastText',
                 }}
               >
-                <Typography variant="subtitle2" fontWeight={600}>
+                <Typography variant="subtitle1" fontWeight={600} fontSize={16}>
                   {selectedRegion.regionName}
                 </Typography>
               </Box>
               {/* Selected Region Stats */}
               <Box sx={{ px: 1.5, py: 1 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" fontSize={14}>
                     {t('Buildings')}
                   </Typography>
-                  <Typography variant="caption" fontWeight={600}>
+                  <Typography variant="body2" fontWeight={600} fontSize={14}>
                     {fNumber(selectedRegion.buildingCount)}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" fontSize={14}>
                     {t('New Buildings')}
                   </Typography>
-                  <Typography variant="caption" fontWeight={600} color="primary.main">
+                  <Typography variant="body2" fontWeight={600} color="primary.main" fontSize={14}>
                     {fNumber(selectedRegion.newBuildings)}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" fontSize={14}>
                     {t('Renovations')}
                   </Typography>
-                  <Typography variant="caption" fontWeight={600} color="warning.main">
+                  <Typography variant="body2" fontWeight={600} color="warning.main" fontSize={14}>
                     {fNumber(selectedRegion.renovations)}
                   </Typography>
                 </Box>
@@ -267,10 +277,10 @@ export function UzbekistanMap({
                     borderTop: `1px dashed ${theme.palette.divider}`,
                   }}
                 >
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" fontSize={14}>
                     {t('Total Cost')}
                   </Typography>
-                  <Typography variant="caption" fontWeight={600} color="success.main">
+                  <Typography variant="body2" fontWeight={600} color="success.main" fontSize={14}>
                     {fShortenNumber(selectedRegion.totalCost)}
                   </Typography>
                 </Box>
@@ -305,33 +315,33 @@ export function UzbekistanMap({
                 color: 'primary.contrastText',
               }}
             >
-              <Typography variant="subtitle2" fontWeight={600}>
+              <Typography variant="subtitle1" fontWeight={600} fontSize={16}>
                 {tooltipData.region.regionName}
               </Typography>
             </Box>
             {/* Content */}
             <Box sx={{ px: 1.5, py: 1 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" fontSize={14}>
                   {t('Buildings')}
                 </Typography>
-                <Typography variant="caption" fontWeight={600}>
+                <Typography variant="body2" fontWeight={600} fontSize={14}>
                   {fNumber(tooltipData.region.buildingCount)}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" fontSize={14}>
                   {t('New Buildings')}
                 </Typography>
-                <Typography variant="caption" fontWeight={600} color="primary.main">
+                <Typography variant="body2" fontWeight={600} color="primary.main" fontSize={14}>
                   {fNumber(tooltipData.region.newBuildings)}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" fontSize={14}>
                   {t('Renovations')}
                 </Typography>
-                <Typography variant="caption" fontWeight={600} color="warning.main">
+                <Typography variant="body2" fontWeight={600} color="warning.main" fontSize={14}>
                   {fNumber(tooltipData.region.renovations)}
                 </Typography>
               </Box>
@@ -344,10 +354,10 @@ export function UzbekistanMap({
                   borderTop: `1px dashed ${theme.palette.divider}`,
                 }}
               >
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" fontSize={14}>
                   {t('Total Cost')}
                 </Typography>
-                <Typography variant="caption" fontWeight={600} color="success.main">
+                <Typography variant="body2" fontWeight={600} color="success.main" fontSize={14}>
                   {fShortenNumber(tooltipData.region.totalCost)}
                 </Typography>
               </Box>

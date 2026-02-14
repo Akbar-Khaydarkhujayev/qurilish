@@ -25,6 +25,10 @@ export const formSchema = z.object({
   construction_cost: z.coerce.string().optional(),
   organization_id: z.number({ required_error: 'Required' }),
   building_type: z.enum(['new_building', 'major_renovation']).default('new_building'),
+  // Camera stream fields
+  camera_login: z.string().optional().nullable(),
+  camera_password: z.string().optional().nullable(),
+  camera_ip: z.string().optional().nullable(),
 });
 
 export type FormFields = z.infer<typeof formSchema>;

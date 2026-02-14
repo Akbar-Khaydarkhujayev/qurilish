@@ -1,4 +1,5 @@
 import path from 'path';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 import checker from 'vite-plugin-checker';
 import { loadEnv, defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
@@ -13,6 +14,7 @@ export default defineConfig({
   // base: env.VITE_BASE_PATH,
   plugins: [
     react(),
+    basicSsl(),
     checker({
       typescript: true,
       eslint: {

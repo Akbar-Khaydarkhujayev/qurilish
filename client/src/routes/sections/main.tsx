@@ -13,6 +13,8 @@ import { AuthGuard } from 'src/auth/guard';
 const Page404 = lazy(() => import('src/pages/error/404'));
 const IndexPage = lazy(() => import('src/pages/dashboard'));
 const DashboardBuildingDetailsPage = lazy(() => import('src/pages/dashboard/building-details'));
+const Dashboard1Page = lazy(() => import('src/pages/dashboard1'));
+const Dashboard1BuildingDetailsPage = lazy(() => import('src/pages/dashboard1/building-details'));
 const BuildingsPage = lazy(() => import('src/pages/dashboard/buildings'));
 const OrganizationsPage = lazy(() => import('src/pages/dashboard/settings/organizations'));
 const UsersPage = lazy(() => import('src/pages/dashboard/settings/users'));
@@ -62,6 +64,8 @@ export const mainRoutes = [
     children: [
       { path: 'dashboard', element: <IndexPage /> }, // URL: /dashboard
       { path: 'dashboard/:id', element: <DashboardBuildingDetailsPage /> }, // URL: /dashboard/:id
+      { path: 'dashboard1', element: <Dashboard1Page /> }, // URL: /dashboard1
+      { path: 'dashboard1/:id', element: <Dashboard1BuildingDetailsPage /> }, // URL: /dashboard1/:id
       { path: 'buildings', element: <BuildingsPage /> }, // URL: /buildings
       {
         path: 'buildings/:id',

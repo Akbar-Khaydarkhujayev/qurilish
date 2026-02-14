@@ -1,13 +1,22 @@
 import { toast } from 'sonner';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useEffect, useCallback } from 'react';
 
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Dialog, Button, MenuItem, DialogTitle, DialogContent } from '@mui/material';
+import {
+  Box,
+  Dialog,
+  Button,
+  MenuItem,
+  Typography,
+  DialogTitle,
+  DialogContent,
+} from '@mui/material';
 
 import { useTranslate } from 'src/locales';
 
+import { Upload } from 'src/components/upload';
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
@@ -18,6 +27,7 @@ import { useCreateBuilding } from '../api/create';
 import { useGetBuildingById } from '../api/get-by-id';
 import { useGetUsers } from '../../settings/users/api/get';
 import { useGetRegions } from '../../settings/regions/api/get';
+import { useUploadBuildingImages } from '../api/building-images';
 import { formSchema, BUILDING_TYPE_OPTIONS } from '../api/schema';
 import { useGetDistricts } from '../../settings/districts/api/get';
 import { useGetContractors } from '../../settings/contractors/api/get';
@@ -47,6 +57,9 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
 
   const { mutate: edit } = useEditBuilding();
   const { mutate: create } = useCreateBuilding();
+  const { mutate: uploadImages } = useUploadBuildingImages();
+
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
 
   const methods = useForm<FormFields>({
     resolver: zodResolver(formSchema),
@@ -82,6 +95,9 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         construction_cost: building.data.construction_cost || '',
         organization_id: building.data.organization_id,
         building_type: building.data.building_type || 'new_building',
+        camera_login: building.data.camera_login || '',
+        camera_password: building.data.camera_password || '',
+        camera_ip: building.data.camera_ip || '',
       });
     } else {
       methods.reset({
@@ -102,7 +118,11 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         construction_cost: '',
         organization_id: user?.organizationId || (undefined as unknown as number),
         building_type: 'new_building',
+        camera_login: '',
+        camera_password: '',
+        camera_ip: '',
       });
+      setImageFiles([]);
     }
   }, [building, methods, open, editedBuildingId, user]);
 
@@ -113,14 +133,57 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
     }
   }, [selectedRegionId, methods, editedBuildingId]);
 
+  const handleDropImages = useCallback((acceptedFiles: File[]) => {
+    setImageFiles((prev) => [...prev, ...acceptedFiles]);
+    setImageError('');
+  }, []);
+
+  const handleRemoveImage = useCallback((file: File | string) => {
+    setImageFiles((prev) => prev.filter((f) => f !== file));
+  }, []);
+
+  const handleRemoveAllImages = useCallback(() => {
+    setImageFiles([]);
+  }, []);
+
+  const [imageError, setImageError] = useState('');
+
   const onSubmit = methods.handleSubmit(
     async (data) => {
+      // Require at least one image when creating a new building
+      if (!editedBuildingId && imageFiles.length === 0) {
+        setImageError(t('At least one building image is required'));
+        return;
+      }
+      setImageError('');
+
       const mutate = editedBuildingId ? edit : create;
 
       mutate(data, {
-        onSuccess: () => {
-          toast.success(t(editedBuildingId ? 'Edited successfully' : 'Created successfully'));
-          onClose();
+        onSuccess: (res: any) => {
+          // Upload images if any were selected
+          const buildingId = editedBuildingId ? Number(editedBuildingId) : res?.data?.id;
+          if (imageFiles.length > 0 && buildingId) {
+            uploadImages(
+              { objectCardId: buildingId, files: imageFiles },
+              {
+                onSuccess: () => {
+                  toast.success(
+                    t(editedBuildingId ? 'Edited successfully' : 'Created successfully')
+                  );
+                  setImageFiles([]);
+                  onClose();
+                },
+                onError: () => {
+                  toast.error(t('Building saved but image upload failed'));
+                  onClose();
+                },
+              }
+            );
+          } else {
+            toast.success(t(editedBuildingId ? 'Edited successfully' : 'Created successfully'));
+            onClose();
+          }
         },
       });
     },
@@ -253,6 +316,42 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
               slotProps={{ textField: { size: 'small' } }}
             />
           </Box>
+
+          {/* Camera Stream Fields */}
+          <Typography variant="subtitle1" sx={{ mt: 3, mb: 1 }}>
+            {t('Camera Settings')}
+          </Typography>
+          <Box display="grid" gridTemplateColumns="repeat(3, 1fr)" gap={2}>
+            <Field.Text size="small" name="camera_login" label={t('Camera Login')} />
+            <Field.Text size="small" name="camera_password" label={t('Camera Password')} />
+            <Field.Text
+              size="small"
+              name="camera_ip"
+              label={t('Camera IP')}
+              placeholder="192.168.77.22"
+            />
+          </Box>
+
+          {/* Image Upload */}
+          <Typography variant="subtitle1" sx={{ mt: 3, mb: 1 }}>
+            {t('Building Images')} *
+          </Typography>
+          <Upload
+            multiple
+            thumbnail
+            error={!!imageError}
+            value={imageFiles}
+            onDrop={handleDropImages}
+            onRemove={handleRemoveImage}
+            onRemoveAll={handleRemoveAllImages}
+            helperText={
+              imageError && (
+                <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+                  {imageError}
+                </Typography>
+              )
+            }
+          />
 
           <Box display="flex" justifyContent="flex-end" gap={1} mt={3} mb={1}>
             <Button

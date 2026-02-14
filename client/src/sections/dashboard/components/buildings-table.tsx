@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { useMemo, useState, useEffect } from 'react';
 
 import Box from '@mui/material/Box';
@@ -23,7 +24,14 @@ import { Iconify } from 'src/components/iconify';
 
 import type { IBuilding } from '../api/get';
 
-export type FilterType = 'all' | 'new_building' | 'major_renovation' | 'overdue';
+export type FilterType =
+  | 'all'
+  | 'new_building'
+  | 'major_renovation'
+  | 'overdue'
+  | 'in_progress'
+  | 'completed'
+  | 'deadline_close';
 
 interface Props {
   buildings: IBuilding[];
@@ -55,6 +63,18 @@ export function BuildingsTable({ buildings, filter, selectedRegionId, onBuilding
       result = result.filter((b) => b.buildingType === 'major_renovation');
     } else if (filter === 'overdue') {
       result = result.filter((b) => b.isOverdue);
+    } else if (filter === 'in_progress') {
+      result = result.filter((b) => b.statusName !== 'Topshirish');
+    } else if (filter === 'completed') {
+      result = result.filter((b) => b.statusName === 'Topshirish');
+    } else if (filter === 'deadline_close') {
+      const sixMonthsFromNow = dayjs().add(6, 'month');
+      result = result.filter(
+        (b) =>
+          b.constructionEndDate &&
+          dayjs(b.constructionEndDate).isBefore(sixMonthsFromNow) &&
+          dayjs(b.constructionEndDate).isAfter(dayjs())
+      );
     }
 
     // Apply search filter
@@ -86,9 +106,12 @@ export function BuildingsTable({ buildings, filter, selectedRegionId, onBuilding
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardHeader
+        sx={{
+          mt: -1,
+        }}
         title={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 3 }}>
-            <span>{t('Buildings')}</span>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pb: 1 }}>
+            <Typography sx={{ fontSize: 24, fontWeight: 600 }}>{t('Buildings')}</Typography>
             <Chip
               size="small"
               label={`${fNumber(filteredBuildings.length)} / ${fNumber(buildings.length)}`}
@@ -112,7 +135,6 @@ export function BuildingsTable({ buildings, filter, selectedRegionId, onBuilding
             sx={{ width: 200 }}
           />
         }
-        sx={{ pb: 0 }}
       />
 
       <TableContainer sx={{ flexGrow: 1, overflow: 'auto' }}>

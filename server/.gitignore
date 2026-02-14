@@ -1,9 +1,6 @@
 # Dependencies
 node_modules/
 
-# Environment variables
-.env
-
 # Build output
 dist/
 
@@ -24,6 +21,9 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# SSL certificates (auto-generated)
+certs/
 
 # Testing
 coverage/

@@ -74,7 +74,10 @@ export const useNavData = () => {
     }
 
     // Main menu items based on role
-    const mainItems = [{ title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard }];
+    const mainItems = [
+      { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
+      { title: 'Dashboard1', path: paths.dashboard1, icon: ICONS.analytics },
+    ];
 
     // Buildings page is hidden from super_admin
     if (userRole !== 'super_admin') {
@@ -110,6 +113,7 @@ export const navData = [
   {
     items: [
       { title: 'Dashboard', path: paths.dashboard.root, icon: ICONS.dashboard },
+      { title: 'Dashboard1', path: paths.dashboard1, icon: ICONS.analytics },
       { title: 'Buildings', path: paths.buildings, icon: ICONS.banking },
     ],
   },
