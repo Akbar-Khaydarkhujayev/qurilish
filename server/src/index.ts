@@ -38,7 +38,14 @@ const uploadsPath =
   process.env.NODE_ENV === "production"
     ? path.join(__dirname, "../uploads")
     : path.join(process.cwd(), "uploads");
-app.use("/uploads", express.static(uploadsPath));
+app.use(
+  "/uploads",
+  (_req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
+  express.static(uploadsPath),
+);
 console.log(`📁 Serving uploads from: ${uploadsPath}`);
 
 // Routes

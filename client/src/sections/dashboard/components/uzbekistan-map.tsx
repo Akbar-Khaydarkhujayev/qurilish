@@ -183,7 +183,11 @@ export function UzbekistanMap({
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', ...sx }}>
       <CardHeader
-        title={t('Buildings by Region')}
+        title={
+          selectedRegion
+            ? `${selectedRegion.regionName} ${t("bo'yicha binolar")}`
+            : t('Buildings by Region')
+        }
         sx={{
           flexShrink: 0,
           '& .MuiCardHeader-title': {

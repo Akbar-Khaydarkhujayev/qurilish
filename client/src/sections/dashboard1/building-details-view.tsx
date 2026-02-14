@@ -110,7 +110,7 @@ export function BuildingDetailsView() {
   const carouselImages = useMemo(() => {
     if (details?.images && details.images.length > 0) {
       return details.images.map((img) => ({
-        src: `${SERVER_URL}/uploads/${img.path}`,
+        src: `${SERVER_URL}${img.path}`,
         alt: img.file_name,
       }));
     }

@@ -248,7 +248,7 @@ export function Dashboard1View() {
           />
           <Tab
             value="in_progress"
-            label={t('In Progress')}
+            label={t('Work in Progress')}
             sx={{
               fontSize: 18,
               fontWeight: 600,

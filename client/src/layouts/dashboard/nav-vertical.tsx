@@ -3,6 +3,7 @@ import type { NavSectionProps } from 'src/components/nav-section';
 
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 
 import { varAlpha, hideScrollY } from 'src/theme/styles';
 
@@ -38,8 +39,15 @@ export function NavVertical({
   const renderNavVertical = (
     <>
       {slots?.topArea ?? (
-        <Box sx={{ pl: 3.5, pt: 2.5, pb: 1 }}>
-          <Logo />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, pl: 2.5, pr: 2, pt: 3, pb: 2 }}>
+          <Logo sx={{ width: 62, height: 62, flexShrink: 0 }} />
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 600, fontSize: 14, lineHeight: 1.5, minWidth: 0 }}
+          >
+            Ichki ishlar vazirligi M va MTTD Kapital qurilish va ta&apos;mirlash boshqarmasi axborot
+            tizimi
+          </Typography>
         </Box>
       )}
 
@@ -53,7 +61,7 @@ export function NavVertical({
     <>
       {slots?.topArea ?? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 2.5 }}>
-          <Logo />
+          <Logo sx={{ width: 64, height: 64 }} />
         </Box>
       )}
 
