@@ -25,6 +25,7 @@ services:
     environment:
       PORT: 5000
       NODE_ENV: development
+      HTTPS_ENABLED: "true"
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: qurilish_db
@@ -32,7 +33,7 @@ services:
       DB_PASSWORD: postgres123
       JWT_SECRET: your_jwt_secret_key_here_change_in_production
       JWT_EXPIRES_IN: 7d
-      CLIENT_URL: http://192.168.77.7:8081
+      CLIENT_URL: https://192.168.77.7:8081
     depends_on:
       - db
     volumes:
@@ -49,8 +50,8 @@ services:
     ports:
       - "8081:8081"
     environment:
-      VITE_SERVER_URL: http://192.168.77.7:5000
-      VITE_ASSET_URL: http://192.168.77.7:5000
+      VITE_SERVER_URL: https://192.168.77.7:5000
+      VITE_ASSET_URL: https://192.168.77.7:5000
     volumes:
       - ./client/src:/app/src
       - ./client/public:/app/public

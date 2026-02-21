@@ -138,12 +138,10 @@ export function BuildingDetailsView() {
     return index >= 0 ? index : 0;
   };
 
-  // Calculate overall completion percentage from sub-objects
-  const overallCompletionPct =
-    details.subObjects && details.subObjects.length > 0
-      ? details.subObjects.reduce((sum, obj) => sum + (obj.completion_percentage || 0), 0) /
-        details.subObjects.length
-      : 0;
+  // Calculate overall completion percentage: (Total Invoices / Construction Cost) * 100
+  const constructionCost = parseFloat(building.construction_cost || '0') || 0;
+  const totalInvoiceAmount = details.invoices?.totalAmount || 0;
+  const overallCompletionPct = constructionCost > 0 ? (totalInvoiceAmount / constructionCost) * 100 : 0;
 
   // Get expenses, invoices, estimates for a specific contract
   const getContractExpenses = (contractId: number) =>
