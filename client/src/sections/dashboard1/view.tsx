@@ -152,7 +152,7 @@ export function Dashboard1View() {
   }, [stats, selectedRegionId]);
 
   const handleBuildingClick = (building: IBuilding) => {
-    navigate(`/dashboard1/${building.id}`);
+    navigate(`/dashboard/${building.id}`);
   };
 
   const handleRegionClick = (regionId: number | null) => {

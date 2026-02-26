@@ -40,6 +40,7 @@ export interface IBuildingDetails {
   technical_supervisor_id: number | null;
   technical_supervisor_name: string | null;
   technical_supervisor_email: string | null;
+  technical_supervisor_phone: string | null;
   camera_login: string | null;
   camera_password: string | null;
   camera_ip: string | null;

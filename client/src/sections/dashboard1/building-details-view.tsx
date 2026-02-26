@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 
 import Box from '@mui/material/Box';
@@ -105,6 +105,29 @@ export function BuildingDetailsView() {
   const { data: constructionStatuses } = useGetConstructionStatuses({ page: 1, limit: 999 });
 
   const [streamOpen, setStreamOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
+
+  const handleExportPdf = async () => {
+    if (!pdfRef.current) return;
+    setExporting(true);
+    try {
+      // eslint-disable-next-line import/no-extraneous-dependencies
+      const { default: html2pdf } = await import(/* @vite-ignore */ 'html2pdf.js');
+      await html2pdf()
+        .set({
+          margin: 8,
+          filename: `${building?.object_name || 'building'}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: theme.palette.background.default },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+        })
+        .from(pdfRef.current)
+        .save();
+    } finally {
+      setExporting(false);
+    }
+  };
 
   // Dynamic carousel images: use DB images if available, else default static images
   const carouselImages = useMemo(() => {
@@ -169,7 +192,7 @@ export function BuildingDetailsView() {
         <Alert severity="error">{t('Error loading building data')}</Alert>
         <Button
           startIcon={<Iconify icon="mdi:arrow-left" />}
-          onClick={() => navigate('/dashboard1')}
+          onClick={() => navigate('/dashboard')}
           sx={{ mt: 2 }}
         >
           {t('back')}
@@ -216,7 +239,7 @@ export function BuildingDetailsView() {
         <Button
           variant="outlined"
           startIcon={<Iconify icon="mdi:arrow-left" />}
-          onClick={() => navigate('/dashboard1')}
+          onClick={() => navigate('/dashboard')}
         >
           {t('back')}
         </Button>
@@ -224,7 +247,7 @@ export function BuildingDetailsView() {
           <Typography variant="h4" sx={{ mb: 1 }}>
             {building.object_name}
           </Typography>
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
             {building.card_number && <Chip label={`#${building.card_number}`} variant="outlined" />}
             <Chip
               label={t(
@@ -232,9 +255,21 @@ export function BuildingDetailsView() {
               )}
               color={building.building_type === 'new_building' ? 'primary' : 'warning'}
             />
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<Iconify icon="mdi:file-pdf-box" />}
+              onClick={handleExportPdf}
+              disabled={exporting}
+            >
+              {exporting ? t('Exporting...') : 'PDF'}
+            </Button>
           </Box>
         </Box>
       </Box>
+
+      {/* PDF-exportable content */}
+      <Box ref={pdfRef} sx={{ bgcolor: 'background.default' }}>
 
       {/* Image Carousel + Compact Info Cards */}
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
@@ -337,30 +372,34 @@ export function BuildingDetailsView() {
         {/* Compact Info Cards */}
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* Obyekt haqida */}
-          <Card sx={{ flex: 1, boxShadow: 3, border: `1px solid ${theme.palette.divider}` }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, p: 4, pb: 0 }}>
-              <Box
-                sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: 'info.lighter',
-                }}
-              >
-                <Iconify icon="mdi:information" width={20} sx={{ color: 'info.main' }} />
-              </Box>
-              <Typography variant="h6" fontSize={20} fontWeight={600} textTransform="uppercase">
-                {t('Obyekt haqida')}
-              </Typography>
-            </Box>
-            <CardContent sx={{ py: 2, display: 'flex', gap: 2, justifyContent: 'space-evenly' }}>
+          <Card
+            sx={{
+              flex: 1,
+              boxShadow: 3,
+              border: `1px solid ${theme.palette.divider}`,
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <CardContent
+              sx={{
+                flex: 1,
+                display: 'grid',
+                gridTemplateColumns: '1.2fr 0.8fr',
+                gap: 0,
+                alignContent: 'center',
+              }}
+            >
               <BigDetailRow
                 label={t('Texnik nazoratchi')}
                 value={building.technical_supervisor_name}
                 icon="mdi:account-check"
+                color="info.main"
+              />
+              <BigDetailRow
+                label={t('Telefon')}
+                value={building.technical_supervisor_phone}
+                icon="mdi:phone"
                 color="info.main"
               />
               <BigDetailRow
@@ -908,6 +947,8 @@ export function BuildingDetailsView() {
           )}
         </CardContent>
       </Card>
+
+      </Box>{/* end pdfRef */}
     </Box>
   );
 }

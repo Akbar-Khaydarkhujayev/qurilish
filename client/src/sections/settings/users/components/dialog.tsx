@@ -58,6 +58,7 @@ export const UserDialog = ({ open, onClose, editedUserId }: IProps) => {
     name: '',
     username: '',
     password: '',
+    phone_number: '',
     organization_id: undefined as unknown as number,
     role: defaultRole,
   };
@@ -75,6 +76,7 @@ export const UserDialog = ({ open, onClose, editedUserId }: IProps) => {
       name: user?.data.name || '',
       username: user?.data.username || '',
       password: '',
+      phone_number: user?.data.phone_number || '',
       organization_id: user?.data.organization_id || undefined,
       role: user?.data.role || defaultRole,
     });
@@ -118,6 +120,13 @@ export const UserDialog = ({ open, onClose, editedUserId }: IProps) => {
               name="password"
               label={t('Password')}
               type="password"
+            />
+
+            <Field.Text
+              size="small"
+              sx={{ mb: 2 }}
+              name="phone_number"
+              label={t('Phone Number')}
             />
 
             <Field.Select

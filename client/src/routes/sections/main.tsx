@@ -11,8 +11,8 @@ import { AuthGuard } from 'src/auth/guard';
 // ----------------------------------------------------------------------
 
 const Page404 = lazy(() => import('src/pages/error/404'));
-const IndexPage = lazy(() => import('src/pages/dashboard'));
-const DashboardBuildingDetailsPage = lazy(() => import('src/pages/dashboard/building-details'));
+// const IndexPage = lazy(() => import('src/pages/dashboard'));
+// const DashboardBuildingDetailsPage = lazy(() => import('src/pages/dashboard/building-details'));
 const Dashboard1Page = lazy(() => import('src/pages/dashboard1'));
 const Dashboard1BuildingDetailsPage = lazy(() => import('src/pages/dashboard1/building-details'));
 const BuildingsPage = lazy(() => import('src/pages/dashboard/buildings'));
@@ -62,10 +62,10 @@ export const mainRoutes = [
     // Pathless layout route: No 'path' here means it doesn't affect the URL
     element: CONFIG.auth.skip ? <>{layoutContent}</> : <AuthGuard>{layoutContent}</AuthGuard>,
     children: [
-      { path: 'dashboard', element: <IndexPage /> }, // URL: /dashboard
-      { path: 'dashboard/:id', element: <DashboardBuildingDetailsPage /> }, // URL: /dashboard/:id
-      { path: 'dashboard1', element: <Dashboard1Page /> }, // URL: /dashboard1
-      { path: 'dashboard1/:id', element: <Dashboard1BuildingDetailsPage /> }, // URL: /dashboard1/:id
+      // { path: 'dashboard', element: <IndexPage /> }, // URL: /dashboard
+      // { path: 'dashboard/:id', element: <DashboardBuildingDetailsPage /> }, // URL: /dashboard/:id
+      { path: 'dashboard', element: <Dashboard1Page /> }, // URL: /dashboard1
+      { path: 'dashboard/:id', element: <Dashboard1BuildingDetailsPage /> }, // URL: /dashboard1/:id
       { path: 'buildings', element: <BuildingsPage /> }, // URL: /buildings
       {
         path: 'buildings/:id',

@@ -23,7 +23,7 @@ import { useDeleteUser } from './api/delete';
 import { UserDialog } from './components/dialog';
 import { UserRowItem } from './components/row-item';
 
-const headLabels = ['Name', 'Username', 'Organization', 'Role', 'Created at', ''];
+const headLabels = ['Name', 'Username', 'Phone Number', 'Organization', 'Role', 'Created at', ''];
 
 export default function UsersView() {
   const { t } = useTranslate();

@@ -49,7 +49,7 @@ export const getAll = async (req: AuthRequest, res: Response): Promise<void> => 
 
     const result = await pool.query(
       `SELECT
-        u.id, u.name, u.username,
+        u.id, u.name, u.username, u.phone_number,
         u.organization_id, u.role, u.user_type, u.created_at, u.updated_at,
         o.name as organization_name
        FROM users u
@@ -65,6 +65,7 @@ export const getAll = async (req: AuthRequest, res: Response): Promise<void> => 
       id: row.id,
       name: row.name,
       username: row.username,
+      phone_number: row.phone_number,
       organization_id: row.organization_id,
       organization: row.organization_id ? { id: row.organization_id, name: row.organization_name } : null,
       role: row.role,
@@ -86,7 +87,7 @@ export const getById = async (req: AuthRequest, res: Response): Promise<void> =>
 
     const result = await pool.query(
       `SELECT
-        u.id, u.name, u.username,
+        u.id, u.name, u.username, u.phone_number,
         u.organization_id, u.role, u.user_type, u.created_at, u.updated_at,
         o.name as organization_name
        FROM users u
@@ -105,6 +106,7 @@ export const getById = async (req: AuthRequest, res: Response): Promise<void> =>
       id: row.id,
       name: row.name,
       username: row.username,
+      phone_number: row.phone_number,
       organization_id: row.organization_id,
       organization: row.organization_id ? { id: row.organization_id, name: row.organization_name } : null,
       role: row.role,
@@ -128,7 +130,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
-    const { username, password, name, organization_id, role } = req.body;
+    const { username, password, name, phone_number, organization_id, role } = req.body;
 
     // Validation
     if (!username || !password || !name || !organization_id || !role) {
@@ -168,10 +170,10 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 
     // Insert user
     const result = await pool.query(
-      `INSERT INTO users (name, username, password, organization_id, role, user_type)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, name, username, organization_id, role, user_type, created_at`,
-      [name, username, hashedPassword, organization_id, role, userType]
+      `INSERT INTO users (name, username, password, phone_number, organization_id, role, user_type)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, name, username, phone_number, organization_id, role, user_type, created_at`,
+      [name, username, hashedPassword, phone_number || null, organization_id, role, userType]
     );
 
     responseFormatter.created(res, result.rows[0], 'User created successfully');
@@ -184,7 +186,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, organization_id, role, password } = req.body;
+    const { name, phone_number, organization_id, role, password } = req.body;
 
     if (!name) {
       responseFormatter.badRequest(res, 'Name is required');
@@ -211,18 +213,18 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       query = `UPDATE users SET
-        name = $1, organization_id = $2, role = $3, user_type = $4, password = $5,
+        name = $1, phone_number = $2, organization_id = $3, role = $4, user_type = $5, password = $6,
         updated_at = CURRENT_TIMESTAMP
-        WHERE id = $6 AND is_deleted = FALSE
-        RETURNING id, name, username, organization_id, role, user_type, created_at, updated_at`;
-      params = [name, organization_id, role, userType, hashedPassword, id];
+        WHERE id = $7 AND is_deleted = FALSE
+        RETURNING id, name, username, phone_number, organization_id, role, user_type, created_at, updated_at`;
+      params = [name, phone_number || null, organization_id, role, userType, hashedPassword, id];
     } else {
       query = `UPDATE users SET
-        name = $1, organization_id = $2, role = $3, user_type = $4,
+        name = $1, phone_number = $2, organization_id = $3, role = $4, user_type = $5,
         updated_at = CURRENT_TIMESTAMP
-        WHERE id = $5 AND is_deleted = FALSE
-        RETURNING id, name, username, organization_id, role, user_type, created_at, updated_at`;
-      params = [name, organization_id, role, userType, id];
+        WHERE id = $6 AND is_deleted = FALSE
+        RETURNING id, name, username, phone_number, organization_id, role, user_type, created_at, updated_at`;
+      params = [name, phone_number || null, organization_id, role, userType, id];
     }
 
     const result = await pool.query(query, params);
