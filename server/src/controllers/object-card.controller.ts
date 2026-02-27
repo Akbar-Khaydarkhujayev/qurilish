@@ -145,7 +145,8 @@ export const getById = async (
         project_organization.phone_number as project_org_phone,
         users.name as technical_supervisor_name,
         users.username as technical_supervisor_username,
-        users.email as technical_supervisor_email
+        users.email as technical_supervisor_email,
+        users.phone_number as technical_supervisor_phone
        FROM object_card
        LEFT JOIN regions ON object_card.region_id = regions.id
        LEFT JOIN districts ON object_card.district_id = districts.id
