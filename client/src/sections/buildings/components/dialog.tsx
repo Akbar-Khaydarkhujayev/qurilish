@@ -10,6 +10,7 @@ import {
   Button,
   MenuItem,
   Typography,
+  IconButton,
   DialogTitle,
   DialogContent,
 } from '@mui/material';
@@ -27,13 +28,17 @@ import { useCreateBuilding } from '../api/create';
 import { useGetBuildingById } from '../api/get-by-id';
 import { useGetUsers } from '../../settings/users/api/get';
 import { useGetRegions } from '../../settings/regions/api/get';
-import { useUploadBuildingImages } from '../api/building-images';
 import { formSchema, BUILDING_TYPE_OPTIONS } from '../api/schema';
 import { useGetDistricts } from '../../settings/districts/api/get';
 import { useGetContractors } from '../../settings/contractors/api/get';
 import { useGetOrganizations } from '../../settings/organizations/api/get';
 import { useGetConstructionStatuses } from '../../settings/construction-statuses/api/get';
 import { useGetProjectOrganizations } from '../../settings/project-organizations/api/get';
+import {
+  useGetBuildingImages,
+  useDeleteBuildingImage,
+  useUploadBuildingImages,
+} from '../api/building-images';
 
 import type { FormFields } from '../api/schema';
 
@@ -58,6 +63,11 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
   const { mutate: edit } = useEditBuilding();
   const { mutate: create } = useCreateBuilding();
   const { mutate: uploadImages } = useUploadBuildingImages();
+  const { mutate: deleteImage } = useDeleteBuildingImage();
+
+  const { data: existingImages } = useGetBuildingImages(editedBuildingId);
+
+  const SERVER_URL = import.meta.env.VITE_SERVER_URL || '';
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
 
@@ -146,12 +156,23 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
     setImageFiles([]);
   }, []);
 
+  const handleDeleteExistingImage = useCallback(
+    (imageId: number) => {
+      deleteImage(imageId, {
+        onSuccess: () => toast.success(t('Image deleted')),
+        onError: () => toast.error(t('Failed to delete image')),
+      });
+    },
+    [deleteImage, t]
+  );
+
   const [imageError, setImageError] = useState('');
 
   const onSubmit = methods.handleSubmit(
     async (data) => {
       // Require at least one image when creating a new building
-      if (!editedBuildingId && imageFiles.length === 0) {
+      const hasExisting = existingImages && existingImages.length > 0;
+      if (!editedBuildingId && imageFiles.length === 0 && !hasExisting) {
         setImageError(t('At least one building image is required'));
         return;
       }
@@ -332,9 +353,55 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
             />
           </Box>
 
+          {/* Existing Images (edit mode) */}
+          {editedBuildingId && existingImages && existingImages.length > 0 && (
+            <>
+              <Typography variant="subtitle1" sx={{ mt: 3, mb: 1 }}>
+                {t('Current Images')}
+              </Typography>
+              <Box display="flex" flexWrap="wrap" gap={1} mb={1}>
+                {existingImages.map((img) => (
+                  <Box
+                    key={img.id}
+                    sx={{
+                      position: 'relative',
+                      width: 100,
+                      height: 100,
+                      borderRadius: 1,
+                      overflow: 'hidden',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <img
+                      src={`${SERVER_URL}${img.path}`}
+                      alt={img.file_name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDeleteExistingImage(img.id)}
+                      sx={{
+                        position: 'absolute',
+                        top: 2,
+                        right: 2,
+                        bgcolor: 'rgba(0,0,0,0.55)',
+                        color: 'white',
+                        p: 0.3,
+                        '&:hover': { bgcolor: 'error.main' },
+                      }}
+                    >
+                      <Iconify icon="mdi:close" width={14} />
+                    </IconButton>
+                  </Box>
+                ))}
+              </Box>
+            </>
+          )}
+
           {/* Image Upload */}
           <Typography variant="subtitle1" sx={{ mt: 3, mb: 1 }}>
-            {t('Building Images')} *
+            {t('Building Images')} {!editedBuildingId && '*'}
           </Typography>
           <Upload
             multiple

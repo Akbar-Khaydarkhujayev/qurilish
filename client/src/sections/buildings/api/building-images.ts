@@ -1,6 +1,26 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import axiosInstance from 'src/utils/axios';
+
+export interface IBuildingImage {
+  id: number;
+  object_card_id: number;
+  path: string;
+  file_name: string;
+  sort_order: number;
+  created_at: string;
+}
+
+// Get images for a building
+const getBuildingImages = (objectCardId: number): Promise<IBuildingImage[]> =>
+  axiosInstance.get(`/object-cards/${objectCardId}/images`).then((res) => res.data.data);
+
+export const useGetBuildingImages = (objectCardId: number | string | undefined) =>
+  useQuery({
+    queryKey: ['building-images', objectCardId],
+    queryFn: () => getBuildingImages(Number(objectCardId)),
+    enabled: !!objectCardId,
+  });
 
 // Upload images for a building
 const uploadBuildingImages = ({ objectCardId, files }: { objectCardId: number; files: File[] }) => {
@@ -36,6 +56,7 @@ export const useDeleteBuildingImage = () => {
     mutationFn: deleteBuildingImage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['building-full-details'] });
+      queryClient.invalidateQueries({ queryKey: ['building-images'] });
     },
   });
 };
