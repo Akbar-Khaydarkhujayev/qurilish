@@ -112,18 +112,42 @@ export function BuildingDetailsView() {
     if (!pdfRef.current) return;
     setExporting(true);
     try {
+      const el = pdfRef.current;
+
+      // Render the full element (all scroll height) into one canvas.
+      // Use the real document clientWidth for windowWidth so CSS/media-queries
+      // compute exactly as they do in the browser (no content narrowing artefact).
       // eslint-disable-next-line import/no-extraneous-dependencies
-      const { default: html2pdf } = await import(/* @vite-ignore */ 'html2pdf.js');
-      await html2pdf()
-        .set({
-          margin: 8,
-          filename: `${building?.object_name || 'building'}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: theme.palette.background.default },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-        })
-        .from(pdfRef.current)
-        .save();
+      const { default: html2canvas } = await import(/* @vite-ignore */ 'html2canvas');
+      const canvas = await html2canvas(el, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: theme.palette.background.default,
+        height: el.scrollHeight,
+        windowWidth: document.documentElement.clientWidth,
+        windowHeight: el.scrollHeight,
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      // canvas.width = el.offsetWidth * scale (html2canvas default when width is not forced)
+      // Divide by scale to get CSS px, then convert to mm (96 DPI)
+      const PX_TO_MM = 25.4 / 96;
+      const widthMm = (canvas.width / 2) * PX_TO_MM;
+      const heightMm = (canvas.height / 2) * PX_TO_MM;
+
+      // Single-page PDF with dimensions matching the content exactly
+      // eslint-disable-next-line import/no-extraneous-dependencies
+      const jspdfModule = await import(/* @vite-ignore */ 'jspdf');
+      const JsPDF = jspdfModule.jsPDF;
+      const pdf = new JsPDF({
+        unit: 'mm',
+        format: [widthMm, heightMm],
+        orientation: widthMm > heightMm ? 'landscape' : 'portrait',
+      });
+
+      pdf.addImage(imgData, 'JPEG', 0, 0, widthMm, heightMm);
+      pdf.save(`${building?.object_name || 'building'}.pdf`);
     } finally {
       setExporting(false);
     }
