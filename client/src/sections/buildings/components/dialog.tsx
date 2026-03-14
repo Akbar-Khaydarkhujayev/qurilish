@@ -108,6 +108,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         camera_login: building.data.camera_login || '',
         camera_password: building.data.camera_password || '',
         camera_ip: building.data.camera_ip || '',
+        account_number: building.data.account_number || '',
       });
     } else {
       methods.reset({
@@ -131,6 +132,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         camera_login: '',
         camera_password: '',
         camera_ip: '',
+        account_number: '',
       });
       setImageFiles([]);
     }
@@ -335,6 +337,17 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
               name="construction_end_date"
               label={t('Construction End Date')}
               slotProps={{ textField: { size: 'small' } }}
+            />
+          </Box>
+
+          {/* Account Number */}
+          <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2} mt={2}>
+            <Field.Text
+              size="small"
+              name="account_number"
+              label={t('Hisob raqam')}
+              placeholder="401210860262877039806179006"
+              inputProps={{ maxLength: 27 }}
             />
           </Box>
 

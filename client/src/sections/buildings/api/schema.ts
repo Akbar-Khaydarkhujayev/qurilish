@@ -29,6 +29,12 @@ export const formSchema = z.object({
   camera_login: z.string().optional().nullable(),
   camera_password: z.string().optional().nullable(),
   camera_ip: z.string().optional().nullable(),
+  // Account number - exactly 27 digits
+  account_number: z
+    .string()
+    .regex(/^\d{27}$/, "Hisob raqam 27 ta raqamdan iborat bo'lishi kerak")
+    .optional()
+    .or(z.literal('')),
 });
 
 export type FormFields = z.infer<typeof formSchema>;

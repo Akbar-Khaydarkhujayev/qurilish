@@ -374,7 +374,17 @@ export const create = async (
       camera_login,
       camera_password,
       camera_ip,
+      account_number,
     } = req.body;
+
+    // Validate account_number format if provided (exactly 27 digits)
+    if (account_number && !/^\d{27}$/.test(account_number)) {
+      responseFormatter.badRequest(
+        res,
+        "Account number must be exactly 27 digits",
+      );
+      return;
+    }
 
     // Validate contractor exists
     const contractorCheck = await pool.query(
@@ -438,8 +448,8 @@ export const create = async (
         card_number, object_name, address, region_id, district_id, construction_basis,
         project_organization_id, object_passport, contractor_id, technical_supervisor_id,
         construction_start_date, construction_end_date, construction_status_id, construction_cost, organization_id, building_type,
-        camera_login, camera_password, camera_ip
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+        camera_login, camera_password, camera_ip, account_number
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
       RETURNING *`,
       [
         card_number || null,
@@ -461,6 +471,7 @@ export const create = async (
         camera_login || null,
         camera_password || null,
         camera_ip || null,
+        account_number || null,
       ],
     );
 
@@ -501,7 +512,17 @@ export const update = async (
       camera_login,
       camera_password,
       camera_ip,
+      account_number,
     } = req.body;
+
+    // Validate account_number format if provided (exactly 27 digits)
+    if (account_number && !/^\d{27}$/.test(account_number)) {
+      responseFormatter.badRequest(
+        res,
+        "Account number must be exactly 27 digits",
+      );
+      return;
+    }
 
     // Validate required fields
     if (
@@ -608,8 +629,8 @@ export const update = async (
         construction_basis = $6, project_organization_id = $7, object_passport = $8,
         contractor_id = $9, technical_supervisor_id = $10, construction_start_date = $11,
         construction_end_date = $12, construction_status_id = $13, construction_cost = $14, organization_id = $15, building_type = $16,
-        camera_login = $17, camera_password = $18, camera_ip = $19
-       WHERE id = $20 AND is_deleted = FALSE
+        camera_login = $17, camera_password = $18, camera_ip = $19, account_number = $20
+       WHERE id = $21 AND is_deleted = FALSE
        RETURNING *`,
       [
         card_number || null,
@@ -631,6 +652,7 @@ export const update = async (
         camera_login || null,
         camera_password || null,
         camera_ip || null,
+        account_number || null,
         id,
       ],
     );

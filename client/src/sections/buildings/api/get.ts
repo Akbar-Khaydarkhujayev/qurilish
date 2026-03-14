@@ -34,6 +34,7 @@ export interface IBuilding {
   camera_login: string;
   camera_password: string;
   camera_ip: string;
+  account_number: string | null;
 }
 
 export interface IBuildingParams extends IReqParams {

@@ -44,6 +44,7 @@ const defaultValues: FormFields = {
   construction_cost: '',
   organization_id: undefined as unknown as number,
   building_type: 'new_building',
+  account_number: '',
 };
 
 export default function DetailsView() {
@@ -92,6 +93,7 @@ export default function DetailsView() {
       construction_cost: building?.data?.construction_cost || '',
       organization_id: building?.data?.organization_id || user?.organizationId,
       building_type: building?.data?.building_type || 'new_building',
+      account_number: building?.data?.account_number || '',
     });
   }, [building, methods, user]);
 
@@ -260,6 +262,17 @@ export default function DetailsView() {
                 name="construction_end_date"
                 label={t('Construction End Date')}
                 slotProps={{ textField: { size: 'small', fullWidth: true } }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Field.Text
+                size="small"
+                name="account_number"
+                label={t('Hisob raqam')}
+                placeholder="401210860262877039806179006"
+                inputProps={{ maxLength: 27 }}
+                fullWidth
               />
             </Grid>
           </Grid>
