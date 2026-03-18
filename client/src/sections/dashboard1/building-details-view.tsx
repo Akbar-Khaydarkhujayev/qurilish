@@ -65,7 +65,7 @@ interface BigDetailRowProps {
 
 function BigDetailRow({ label, value, icon, color = 'text.primary' }: BigDetailRowProps) {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1.5 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1.5, maxWidth: '400px' }}>
       <Box
         sx={{
           width: 48,
@@ -294,536 +294,434 @@ export function BuildingDetailsView() {
 
       {/* PDF-exportable content */}
       <Box ref={pdfRef} sx={{ bgcolor: 'background.default' }}>
-
-      {/* Image Carousel + Compact Info Cards */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        {/* Image Carousel */}
-        <Card sx={{ flex: 1, overflow: 'hidden' }}>
-          <CarouselArrowBasicButtons
-            {...carousel.arrows}
-            options={carousel.options}
-            sx={{
-              top: 8,
-              right: 8,
-              position: 'absolute',
-              color: 'common.white',
-              zIndex: 9,
-              '& button': {
-                bgcolor: 'rgba(0,0,0,0.48)',
-                '&:hover': { bgcolor: 'rgba(0,0,0,0.72)' },
-              },
-            }}
-          />
-
-          {/* Stream button - only show if camera is configured */}
-          {hasCameraConfig && (
-            <IconButton
-              onClick={() => setStreamOpen(true)}
+        {/* Image Carousel + Compact Info Cards */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          {/* Image Carousel */}
+          <Card sx={{ flex: 1, overflow: 'hidden' }}>
+            <CarouselArrowBasicButtons
+              {...carousel.arrows}
+              options={carousel.options}
               sx={{
+                top: 8,
+                right: 8,
                 position: 'absolute',
-                bottom: 12,
-                left: 12,
-                zIndex: 9,
-                width: 48,
-                height: 48,
                 color: 'common.white',
-                bgcolor: 'rgba(0,0,0,0.48)',
-                '&:hover': { bgcolor: 'error.main' },
+                zIndex: 9,
+                '& button': {
+                  bgcolor: 'rgba(0,0,0,0.48)',
+                  '&:hover': { bgcolor: 'rgba(0,0,0,0.72)' },
+                },
+              }}
+            />
+
+            {/* Stream button - only show if camera is configured */}
+            {hasCameraConfig && (
+              <IconButton
+                onClick={() => setStreamOpen(true)}
+                sx={{
+                  position: 'absolute',
+                  bottom: 12,
+                  left: 12,
+                  zIndex: 9,
+                  width: 48,
+                  height: 48,
+                  color: 'common.white',
+                  bgcolor: 'rgba(0,0,0,0.48)',
+                  '&:hover': { bgcolor: 'error.main' },
+                }}
+              >
+                <Iconify icon="mdi:video-outline" width={28} />
+              </IconButton>
+            )}
+
+            <Carousel carousel={carousel}>
+              {carouselImages.map((img, index) => (
+                <Box
+                  key={index}
+                  component="img"
+                  src={img.src}
+                  alt={img.alt}
+                  sx={{
+                    width: '100%',
+                    height: 450,
+                    objectFit: 'cover',
+                  }}
+                />
+              ))}
+            </Carousel>
+          </Card>
+
+          {/* Stream Dialog */}
+          <Dialog
+            open={streamOpen}
+            onClose={() => setStreamOpen(false)}
+            maxWidth="lg"
+            fullWidth
+            PaperProps={{ sx: { bgcolor: 'background.paper' } }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                px: 3,
+                py: 2,
               }}
             >
-              <Iconify icon="mdi:video-outline" width={28} />
-            </IconButton>
-          )}
-
-          <Carousel carousel={carousel}>
-            {carouselImages.map((img, index) => (
-              <Box
-                key={index}
-                component="img"
-                src={img.src}
-                alt={img.alt}
-                sx={{
-                  width: '100%',
-                  height: 450,
-                  objectFit: 'cover',
-                }}
-              />
-            ))}
-          </Carousel>
-        </Card>
-
-        {/* Stream Dialog */}
-        <Dialog
-          open={streamOpen}
-          onClose={() => setStreamOpen(false)}
-          maxWidth="lg"
-          fullWidth
-          PaperProps={{ sx: { bgcolor: 'background.paper' } }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              px: 3,
-              py: 2,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box
-                sx={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  bgcolor: 'error.main',
-                  animation: 'pulse 1.5s infinite',
-                  '@keyframes pulse': {
-                    '0%': { opacity: 1 },
-                    '50%': { opacity: 0.4 },
-                    '100%': { opacity: 1 },
-                  },
-                }}
-              />
-              <Typography variant="h6">{t('Jonli efir')}</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    bgcolor: 'error.main',
+                    animation: 'pulse 1.5s infinite',
+                    '@keyframes pulse': {
+                      '0%': { opacity: 1 },
+                      '50%': { opacity: 0.4 },
+                      '100%': { opacity: 1 },
+                    },
+                  }}
+                />
+                <Typography variant="h6">{t('Jonli efir')}</Typography>
+              </Box>
+              <IconButton onClick={() => setStreamOpen(false)}>
+                <Iconify icon="mdi:close" width={24} />
+              </IconButton>
             </Box>
-            <IconButton onClick={() => setStreamOpen(false)}>
-              <Iconify icon="mdi:close" width={24} />
-            </IconButton>
-          </Box>
-          <DialogContent>{streamOpen && <WebCodecsPlayer wsUrl={streamUrl} />}</DialogContent>
-        </Dialog>
+            <DialogContent>{streamOpen && <WebCodecsPlayer wsUrl={streamUrl} />}</DialogContent>
+          </Dialog>
 
-        {/* Compact Info Cards */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* Obyekt haqida */}
-          <Card
-            sx={{
-              flex: 1,
-              boxShadow: 3,
-              border: `1px solid ${theme.palette.divider}`,
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <CardContent
+          {/* Compact Info Cards */}
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Obyekt haqida */}
+            <Card
               sx={{
                 flex: 1,
-                display: 'grid',
-                gridTemplateColumns: '1.2fr 0.8fr',
-                gap: 0,
-                alignContent: 'center',
+                boxShadow: 3,
+                border: `1px solid ${theme.palette.divider}`,
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
-              <BigDetailRow
-                label={t('Texnik nazoratchi')}
-                value={building.technical_supervisor_name}
-                icon="mdi:account-check"
-                color="info.main"
-              />
-              <BigDetailRow
-                label={t('Telefon')}
-                value={building.technical_supervisor_phone}
-                icon="mdi:phone"
-                color="info.main"
-              />
-              <BigDetailRow
-                label={t('Boshlanish sanasi')}
-                value={
-                  building.construction_start_date
-                    ? dayjs(building.construction_start_date).format('DD.MM.YYYY')
-                    : null
-                }
-                icon="mdi:calendar-start"
-                color="success.main"
-              />
-              <BigDetailRow
-                label={t('Tugash sanasi')}
-                value={
-                  building.construction_end_date
-                    ? dayjs(building.construction_end_date).format('DD.MM.YYYY')
-                    : null
-                }
-                icon="mdi:calendar-end"
-                color="error.main"
-              />
+              <CardContent
+                sx={{
+                  flex: 1,
+                  display: 'grid',
+                  gridTemplateColumns: '1.2fr 0.8fr',
+                  gap: 0,
+                  alignContent: 'center',
+                }}
+              >
+                <BigDetailRow
+                  label={t('Texnik nazoratchi')}
+                  value={building.technical_supervisor_name}
+                  icon="mdi:account-check"
+                  color="info.main"
+                />
+                <BigDetailRow
+                  label={t('Telefon')}
+                  value={building.technical_supervisor_phone}
+                  icon="mdi:phone"
+                  color="info.main"
+                />
+                <BigDetailRow
+                  label={t('Boshlanish sanasi')}
+                  value={
+                    building.construction_start_date
+                      ? dayjs(building.construction_start_date).format('DD.MM.YYYY')
+                      : null
+                  }
+                  icon="mdi:calendar-start"
+                  color="success.main"
+                />
+                <BigDetailRow
+                  label={t('Tugash sanasi')}
+                  value={
+                    building.construction_end_date
+                      ? dayjs(building.construction_end_date).format('DD.MM.YYYY')
+                      : null
+                  }
+                  icon="mdi:calendar-end"
+                  color="error.main"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Pudratchi + Loyiha tashkiloti side by side */}
+            <Box sx={{ display: 'flex', gap: 2, flex: 1 }}>
+              {/* Pudratchi haqida */}
+              <Card sx={{ flex: 1, boxShadow: 3, border: `1px solid ${theme.palette.divider}` }}>
+                <CardContent sx={{ py: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Box
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: 'warning.lighter',
+                      }}
+                    >
+                      <Iconify
+                        icon="mdi:account-hard-hat"
+                        width={20}
+                        sx={{ color: 'warning.main' }}
+                      />
+                    </Box>
+                    <Typography
+                      variant="h6"
+                      fontSize={20}
+                      fontWeight={600}
+                      textTransform="uppercase"
+                    >
+                      {t('Pudratchi haqida')}
+                    </Typography>
+                  </Box>
+                  <BigDetailRow
+                    label={t('Tashkilot nomi')}
+                    value={building.contractor_name}
+                    icon="mdi:domain"
+                    color="warning.main"
+                  />
+                  <BigDetailRow
+                    label={t('Telefon')}
+                    value={building.contractor_phone}
+                    icon="mdi:phone"
+                    color="warning.main"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Loyiha tashkiloti haqida */}
+              <Card sx={{ flex: 1, boxShadow: 3, border: `1px solid ${theme.palette.divider}` }}>
+                <CardContent sx={{ py: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <Box
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: 'primary.lighter',
+                      }}
+                    >
+                      <Iconify
+                        icon="mdi:office-building"
+                        width={20}
+                        sx={{ color: 'primary.main' }}
+                      />
+                    </Box>
+                    <Typography
+                      variant="h6"
+                      fontSize={20}
+                      fontWeight={600}
+                      textTransform="uppercase"
+                    >
+                      {t('Loyiha tashkiloti haqida')}
+                    </Typography>
+                  </Box>
+                  <BigDetailRow
+                    label={t('Tashkilot nomi')}
+                    value={building.project_organization_name}
+                    icon="mdi:domain"
+                    color="primary.main"
+                  />
+                  <BigDetailRow
+                    label={t('Telefon')}
+                    value={building.project_org_phone}
+                    icon="mdi:phone"
+                    color="primary.main"
+                  />
+                </CardContent>
+              </Card>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Top Row: Stage Stepper + Progress + Construction Cost */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          {/* Stage Stepper Card */}
+          <Card sx={{ flex: 2 }}>
+            <CardHeader
+              title={t('Loyiha qaysi bosqichda')}
+              titleTypographyProps={{ variant: 'subtitle1' }}
+              avatar={<Iconify icon="mdi:flag-checkered" width={24} color="primary.main" />}
+            />
+            <CardContent>
+              <Stepper activeStep={getCurrentStage()} alternativeLabel>
+                {sortedStatuses.map((status) => (
+                  <Step key={status.id}>
+                    <StepLabel>{status.name}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
             </CardContent>
           </Card>
 
-          {/* Pudratchi + Loyiha tashkiloti side by side */}
-          <Box sx={{ display: 'flex', gap: 2, flex: 1 }}>
-            {/* Pudratchi haqida */}
-            <Card sx={{ flex: 1, boxShadow: 3, border: `1px solid ${theme.palette.divider}` }}>
-              <CardContent sx={{ py: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <Box
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: 'warning.lighter',
-                    }}
-                  >
+          {/* Bajarilgan ishlar Progress Card */}
+          <CompletionWidget
+            title={t('Bajarilgan ishlar')}
+            percent={overallCompletionPct}
+            icon="mdi:clipboard-check-outline"
+          />
+
+          {/* Construction Cost Card */}
+          <Card
+            sx={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              display: 'flex',
+            }}
+          >
+            <CardContent sx={{ textAlign: 'center', py: 3 }}>
+              <Typography variant="h4" gutterBottom>
+                {t('Construction Cost')}
+              </Typography>
+              <Typography variant="h3" color="primary.main">
+                {building.construction_cost ? `${fNumber(building.construction_cost)} сум` : '-'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+
+        {/* Financial Summary Cards */}
+        <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+          {/* Total Bank Expenses */}
+          <Card sx={{ flex: 1 }}>
+            <CardContent sx={{ textAlign: 'center', py: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                <Iconify icon="mdi:bank-transfer-out" width={32} sx={{ color: 'error.main' }} />
+              </Box>
+              <Typography variant="h5" color="text.secondary" gutterBottom>
+                {t('Total Expenses')}
+              </Typography>
+              <Typography variant="h4" color="error.main">
+                {details.expenses?.totalAmount
+                  ? `${fNumber(details.expenses.totalAmount)} сум`
+                  : '0 сум'}
+              </Typography>
+            </CardContent>
+          </Card>
+
+          {/* Total Invoices */}
+          <Card sx={{ flex: 1 }}>
+            <CardContent sx={{ textAlign: 'center', py: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                <Iconify icon="mdi:receipt" width={32} sx={{ color: 'success.main' }} />
+              </Box>
+              <Typography variant="h5" color="text.secondary" gutterBottom>
+                {t('Total Invoices')}
+              </Typography>
+              <Typography variant="h4" color="success.main">
+                {details.invoices?.totalAmount
+                  ? `${fNumber(details.invoices.totalAmount)} сум`
+                  : '0 сум'}
+              </Typography>
+            </CardContent>
+          </Card>
+
+          {/* Difference */}
+          {(() => {
+            const totalExpenses = details.expenses?.totalAmount || 0;
+            const totalInvoices = details.invoices?.totalAmount || 0;
+            const difference = totalExpenses - totalInvoices;
+            const isPositive = difference > 0;
+            const isNegative = difference < 0;
+
+            return (
+              <Card sx={{ flex: 1 }}>
+                <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
                     <Iconify
-                      icon="mdi:account-hard-hat"
-                      width={20}
-                      sx={{ color: 'warning.main' }}
+                      icon={
+                        isPositive
+                          ? 'mdi:arrow-up-circle'
+                          : isNegative
+                            ? 'mdi:arrow-down-circle'
+                            : 'mdi:equal'
+                      }
+                      width={32}
+                      sx={{
+                        color: isPositive
+                          ? 'info.main'
+                          : isNegative
+                            ? 'warning.main'
+                            : 'text.secondary',
+                      }}
                     />
                   </Box>
-                  <Typography variant="h6" fontSize={20} fontWeight={600} textTransform="uppercase">
-                    {t('Pudratchi haqida')}
+                  <Typography variant="h5" color="text.secondary" gutterBottom>
+                    {isPositive
+                      ? t('Буюртмачи фойдасига')
+                      : isNegative
+                        ? t('Пудратчи фойдасига')
+                        : t('Тенг')}
                   </Typography>
-                </Box>
-                <BigDetailRow
-                  label={t('Tashkilot nomi')}
-                  value={building.contractor_name}
-                  icon="mdi:domain"
-                  color="warning.main"
-                />
-                <BigDetailRow
-                  label={t('Telefon')}
-                  value={building.contractor_phone}
-                  icon="mdi:phone"
-                  color="warning.main"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Loyiha tashkiloti haqida */}
-            <Card sx={{ flex: 1, boxShadow: 3, border: `1px solid ${theme.palette.divider}` }}>
-              <CardContent sx={{ py: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <Box
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: 'primary.lighter',
-                    }}
-                  >
-                    <Iconify icon="mdi:office-building" width={20} sx={{ color: 'primary.main' }} />
-                  </Box>
-                  <Typography variant="h6" fontSize={20} fontWeight={600} textTransform="uppercase">
-                    {t('Loyiha tashkiloti haqida')}
-                  </Typography>
-                </Box>
-                <BigDetailRow
-                  label={t('Tashkilot nomi')}
-                  value={building.project_organization_name}
-                  icon="mdi:domain"
-                  color="primary.main"
-                />
-                <BigDetailRow
-                  label={t('Telefon')}
-                  value={building.project_org_phone}
-                  icon="mdi:phone"
-                  color="primary.main"
-                />
-              </CardContent>
-            </Card>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* Top Row: Stage Stepper + Progress + Construction Cost */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        {/* Stage Stepper Card */}
-        <Card sx={{ flex: 2 }}>
-          <CardHeader
-            title={t('Loyiha qaysi bosqichda')}
-            titleTypographyProps={{ variant: 'subtitle1' }}
-            avatar={<Iconify icon="mdi:flag-checkered" width={24} color="primary.main" />}
-          />
-          <CardContent>
-            <Stepper activeStep={getCurrentStage()} alternativeLabel>
-              {sortedStatuses.map((status) => (
-                <Step key={status.id}>
-                  <StepLabel>{status.name}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-          </CardContent>
-        </Card>
-
-        {/* Bajarilgan ishlar Progress Card */}
-        <CompletionWidget
-          title={t('Bajarilgan ishlar')}
-          percent={overallCompletionPct}
-          icon="mdi:clipboard-check-outline"
-        />
-
-        {/* Construction Cost Card */}
-        <Card
-          sx={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            display: 'flex',
-          }}
-        >
-          <CardContent sx={{ textAlign: 'center', py: 3 }}>
-            <Typography variant="h4" gutterBottom>
-              {t('Construction Cost')}
-            </Typography>
-            <Typography variant="h3" color="primary.main">
-              {building.construction_cost ? `${fNumber(building.construction_cost)} сум` : '-'}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Box>
-
-      {/* Financial Summary Cards */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        {/* Total Bank Expenses */}
-        <Card sx={{ flex: 1 }}>
-          <CardContent sx={{ textAlign: 'center', py: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-              <Iconify icon="mdi:bank-transfer-out" width={32} sx={{ color: 'error.main' }} />
-            </Box>
-            <Typography variant="h5" color="text.secondary" gutterBottom>
-              {t('Total Expenses')}
-            </Typography>
-            <Typography variant="h4" color="error.main">
-              {details.expenses?.totalAmount
-                ? `${fNumber(details.expenses.totalAmount)} сум`
-                : '0 сум'}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        {/* Total Invoices */}
-        <Card sx={{ flex: 1 }}>
-          <CardContent sx={{ textAlign: 'center', py: 3 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-              <Iconify icon="mdi:receipt" width={32} sx={{ color: 'success.main' }} />
-            </Box>
-            <Typography variant="h5" color="text.secondary" gutterBottom>
-              {t('Total Invoices')}
-            </Typography>
-            <Typography variant="h4" color="success.main">
-              {details.invoices?.totalAmount
-                ? `${fNumber(details.invoices.totalAmount)} сум`
-                : '0 сум'}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        {/* Difference */}
-        {(() => {
-          const totalExpenses = details.expenses?.totalAmount || 0;
-          const totalInvoices = details.invoices?.totalAmount || 0;
-          const difference = totalExpenses - totalInvoices;
-          const isPositive = difference > 0;
-          const isNegative = difference < 0;
-
-          return (
-            <Card sx={{ flex: 1 }}>
-              <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-                  <Iconify
-                    icon={
-                      isPositive
-                        ? 'mdi:arrow-up-circle'
-                        : isNegative
-                          ? 'mdi:arrow-down-circle'
-                          : 'mdi:equal'
-                    }
-                    width={32}
+                  <Typography
+                    variant="h4"
                     sx={{
                       color: isPositive
                         ? 'info.main'
                         : isNegative
                           ? 'warning.main'
-                          : 'text.secondary',
+                          : 'text.primary',
                     }}
-                  />
-                </Box>
-                <Typography variant="h5" color="text.secondary" gutterBottom>
-                  {isPositive
-                    ? t('Буюртмачи фойдасига')
-                    : isNegative
-                      ? t('Пудратчи фойдасига')
-                      : t('Тенг')}
-                </Typography>
-                <Typography
-                  variant="h4"
-                  sx={{
-                    color: isPositive ? 'info.main' : isNegative ? 'warning.main' : 'text.primary',
-                  }}
-                >
-                  {`${fNumber(Math.abs(difference))} сум`}
-                </Typography>
-              </CardContent>
-            </Card>
-          );
-        })()}
-      </Box>
+                  >
+                    {`${fNumber(Math.abs(difference))} сум`}
+                  </Typography>
+                </CardContent>
+              </Card>
+            );
+          })()}
+        </Box>
 
-      {/* Sub Objects with expandable items */}
-      <Card sx={{ mb: 3 }}>
-        <CardHeader
-          sx={{ mb: 2 }}
-          title={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {t('Sub Objects')}
-              <Chip size="small" label={details.subObjects?.length || 0} />
-            </Box>
-          }
-          avatar={<Iconify icon="mdi:folder-multiple" width={24} color="primary.main" />}
-        />
-        <CardContent sx={{ p: 0 }}>
-          {details.subObjects && details.subObjects.length > 0 ? (
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell width={50} />
-                    <TableCell>{t('Name')}</TableCell>
-                    <TableCell>{t('Deadline')}</TableCell>
-                    <TableCell align="right">{t('Cost')}</TableCell>
-                    <TableCell>{t('Completion %')}</TableCell>
-                    <TableCell align="center">{t('Items')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {details.subObjects.map((subObj) => (
-                    <>
-                      <TableRow
-                        key={subObj.id}
-                        hover
-                        sx={{ cursor: subObj.items_count > 0 ? 'pointer' : 'default' }}
-                        onClick={() => subObj.items_count > 0 && toggleSubObject(subObj.id)}
-                      >
-                        <TableCell>
-                          {subObj.items_count > 0 && (
-                            <IconButton size="small">
-                              <Iconify
-                                icon={
-                                  expandedSubObjects.includes(subObj.id)
-                                    ? 'mdi:chevron-down'
-                                    : 'mdi:chevron-right'
-                                }
-                                width={20}
-                              />
-                            </IconButton>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" fontWeight={500}>
-                            {subObj.name}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ color: subObj.deadline ? 'error.main' : 'text.secondary' }}
-                          >
-                            {subObj.deadline ? dayjs(subObj.deadline).format('DD.MM.YYYY') : '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="right">
-                          {subObj.cost ? fNumber(subObj.cost) : '-'}
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <LinearProgress
-                              variant="determinate"
-                              value={subObj.completion_percentage || 0}
-                              sx={{ flexGrow: 1, height: 6, borderRadius: 1 }}
-                              color={
-                                subObj.completion_percentage >= 100
-                                  ? 'success'
-                                  : subObj.completion_percentage >= 50
-                                    ? 'primary'
-                                    : 'warning'
-                              }
-                            />
-                            <Typography variant="caption" sx={{ minWidth: 40 }}>
-                              {fPercent(subObj.completion_percentage || 0)}
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Chip size="small" label={subObj.items_count || 0} />
-                        </TableCell>
-                      </TableRow>
-                      {/* Expanded items row */}
-                      <TableRow>
-                        <TableCell colSpan={6} sx={{ py: 0, border: 0 }}>
-                          <Collapse
-                            in={expandedSubObjects.includes(subObj.id)}
-                            timeout="auto"
-                            unmountOnExit
-                          >
-                            <SubObjectItems subObjectId={subObj.id} />
-                          </Collapse>
-                        </TableCell>
-                      </TableRow>
-                    </>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <Typography color="text.secondary" textAlign="center" py={3}>
-              {t('No data available')}
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Contracts with expandable expenses/invoices/estimates */}
-      <Card sx={{ mb: 3 }}>
-        <CardHeader
-          sx={{ mb: 2 }}
-          title={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {t('Contracts')}
-              <Chip size="small" label={details.contracts?.length || 0} />
-            </Box>
-          }
-          avatar={<Iconify icon="mdi:file-document" width={24} color="info.main" />}
-        />
-        <CardContent sx={{ p: 0 }}>
-          {details.contracts && details.contracts.length > 0 ? (
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell width={50} />
-                    <TableCell>{t('Contract Number')}</TableCell>
-                    <TableCell>{t('Contract Date')}</TableCell>
-                    <TableCell align="right">{t('Contract Amount')}</TableCell>
-                    <TableCell>{t('Stage')}</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {details.contracts.map((contract) => {
-                    const expenses = getContractExpenses(contract.id);
-                    const invoices = getContractInvoices(contract.id);
-                    const estimates = getContractEstimates(contract.id);
-                    const hasRelatedData =
-                      expenses.length > 0 || invoices.length > 0 || estimates.length > 0;
-
-                    return (
+        {/* Sub Objects with expandable items */}
+        <Card sx={{ mb: 3 }}>
+          <CardHeader
+            sx={{ mb: 2 }}
+            title={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {t('Sub Objects')}
+                <Chip size="small" label={details.subObjects?.length || 0} />
+              </Box>
+            }
+            avatar={<Iconify icon="mdi:folder-multiple" width={24} color="primary.main" />}
+          />
+          <CardContent sx={{ p: 0 }}>
+            {details.subObjects && details.subObjects.length > 0 ? (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell width={50} />
+                      <TableCell>{t('Name')}</TableCell>
+                      <TableCell>{t('Deadline')}</TableCell>
+                      <TableCell align="right">{t('Cost')}</TableCell>
+                      <TableCell>{t('Completion %')}</TableCell>
+                      <TableCell align="center">{t('Items')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {details.subObjects.map((subObj) => (
                       <>
                         <TableRow
-                          key={contract.id}
+                          key={subObj.id}
                           hover
-                          sx={{ cursor: hasRelatedData ? 'pointer' : 'default' }}
-                          onClick={() => hasRelatedData && toggleContract(contract.id)}
+                          sx={{ cursor: subObj.items_count > 0 ? 'pointer' : 'default' }}
+                          onClick={() => subObj.items_count > 0 && toggleSubObject(subObj.id)}
                         >
                           <TableCell>
-                            {hasRelatedData && (
+                            {subObj.items_count > 0 && (
                               <IconButton size="small">
                                 <Iconify
                                   icon={
-                                    expandedContracts.includes(contract.id)
+                                    expandedSubObjects.includes(subObj.id)
                                       ? 'mdi:chevron-down'
                                       : 'mdi:chevron-right'
                                   }
@@ -834,145 +732,264 @@ export function BuildingDetailsView() {
                           </TableCell>
                           <TableCell>
                             <Typography variant="body2" fontWeight={500}>
-                              {contract.contract_number || '-'}
+                              {subObj.name}
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            {contract.contract_date
-                              ? dayjs(contract.contract_date).format('DD.MM.YYYY')
-                              : '-'}
+                            <Typography
+                              variant="body2"
+                              sx={{ color: subObj.deadline ? 'error.main' : 'text.secondary' }}
+                            >
+                              {subObj.deadline ? dayjs(subObj.deadline).format('DD.MM.YYYY') : '-'}
+                            </Typography>
                           </TableCell>
                           <TableCell align="right">
-                            {contract.contract_amount ? fNumber(contract.contract_amount) : '-'}
+                            {subObj.cost ? fNumber(subObj.cost) : '-'}
                           </TableCell>
-                          <TableCell>{contract.stage || '-'}</TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <LinearProgress
+                                variant="determinate"
+                                value={subObj.completion_percentage || 0}
+                                sx={{ flexGrow: 1, height: 6, borderRadius: 1 }}
+                                color={
+                                  subObj.completion_percentage >= 100
+                                    ? 'success'
+                                    : subObj.completion_percentage >= 50
+                                      ? 'primary'
+                                      : 'warning'
+                                }
+                              />
+                              <Typography variant="caption" sx={{ minWidth: 40 }}>
+                                {fPercent(subObj.completion_percentage || 0)}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Chip size="small" label={subObj.items_count || 0} />
+                          </TableCell>
                         </TableRow>
-                        {/* Expanded contract details row */}
+                        {/* Expanded items row */}
                         <TableRow>
-                          <TableCell colSpan={5} sx={{ py: 0, border: 0 }}>
+                          <TableCell colSpan={6} sx={{ py: 0, border: 0 }}>
                             <Collapse
-                              in={expandedContracts.includes(contract.id)}
+                              in={expandedSubObjects.includes(subObj.id)}
                               timeout="auto"
                               unmountOnExit
                             >
-                              <ContractDetails
-                                expenses={expenses}
-                                invoices={invoices}
-                                estimates={estimates}
-                              />
+                              <SubObjectItems subObjectId={subObj.id} />
                             </Collapse>
                           </TableCell>
                         </TableRow>
                       </>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <Typography color="text.secondary" textAlign="center" py={3}>
-              {t('No data available')}
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <Typography color="text.secondary" textAlign="center" py={3}>
+                {t('No data available')}
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Files */}
-      <Card>
-        <CardHeader
-          title={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {t('Files')}
-              <Chip size="small" label={details.files?.count || 0} />
-            </Box>
-          }
-          avatar={<Iconify icon="mdi:file-multiple" width={24} color="warning.main" />}
-        />
-        <CardContent>
-          {details.files?.files && details.files.files.length > 0 ? (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-              {details.files.files.map((file) => {
-                const ext = file.file_name?.split('.').pop()?.toLowerCase() || '';
-                const isPdf = ext === 'pdf';
-                const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
-                const isDoc = ['doc', 'docx'].includes(ext);
-                const isExcel = ['xls', 'xlsx'].includes(ext);
+        {/* Contracts with expandable expenses/invoices/estimates */}
+        <Card sx={{ mb: 3 }}>
+          <CardHeader
+            sx={{ mb: 2 }}
+            title={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {t('Contracts')}
+                <Chip size="small" label={details.contracts?.length || 0} />
+              </Box>
+            }
+            avatar={<Iconify icon="mdi:file-document" width={24} color="info.main" />}
+          />
+          <CardContent sx={{ p: 0 }}>
+            {details.contracts && details.contracts.length > 0 ? (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell width={50} />
+                      <TableCell>{t('Contract Number')}</TableCell>
+                      <TableCell>{t('Contract Date')}</TableCell>
+                      <TableCell align="right">{t('Contract Amount')}</TableCell>
+                      <TableCell>{t('Stage')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {details.contracts.map((contract) => {
+                      const expenses = getContractExpenses(contract.id);
+                      const invoices = getContractInvoices(contract.id);
+                      const estimates = getContractEstimates(contract.id);
+                      const hasRelatedData =
+                        expenses.length > 0 || invoices.length > 0 || estimates.length > 0;
 
-                let fileIcon = 'mdi:file-outline';
-                let iconColor = 'text.secondary';
+                      return (
+                        <>
+                          <TableRow
+                            key={contract.id}
+                            hover
+                            sx={{ cursor: hasRelatedData ? 'pointer' : 'default' }}
+                            onClick={() => hasRelatedData && toggleContract(contract.id)}
+                          >
+                            <TableCell>
+                              {hasRelatedData && (
+                                <IconButton size="small">
+                                  <Iconify
+                                    icon={
+                                      expandedContracts.includes(contract.id)
+                                        ? 'mdi:chevron-down'
+                                        : 'mdi:chevron-right'
+                                    }
+                                    width={20}
+                                  />
+                                </IconButton>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Typography variant="body2" fontWeight={500}>
+                                {contract.contract_number || '-'}
+                              </Typography>
+                            </TableCell>
+                            <TableCell>
+                              {contract.contract_date
+                                ? dayjs(contract.contract_date).format('DD.MM.YYYY')
+                                : '-'}
+                            </TableCell>
+                            <TableCell align="right">
+                              {contract.contract_amount ? fNumber(contract.contract_amount) : '-'}
+                            </TableCell>
+                            <TableCell>{contract.stage || '-'}</TableCell>
+                          </TableRow>
+                          {/* Expanded contract details row */}
+                          <TableRow>
+                            <TableCell colSpan={5} sx={{ py: 0, border: 0 }}>
+                              <Collapse
+                                in={expandedContracts.includes(contract.id)}
+                                timeout="auto"
+                                unmountOnExit
+                              >
+                                <ContractDetails
+                                  expenses={expenses}
+                                  invoices={invoices}
+                                  estimates={estimates}
+                                />
+                              </Collapse>
+                            </TableCell>
+                          </TableRow>
+                        </>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            ) : (
+              <Typography color="text.secondary" textAlign="center" py={3}>
+                {t('No data available')}
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
 
-                if (isPdf) {
-                  fileIcon = 'mdi:file-pdf-box';
-                  iconColor = 'error.main';
-                } else if (isImage) {
-                  fileIcon = 'mdi:file-image';
-                  iconColor = 'success.main';
-                } else if (isDoc) {
-                  fileIcon = 'mdi:file-word';
-                  iconColor = 'info.main';
-                } else if (isExcel) {
-                  fileIcon = 'mdi:file-excel';
-                  iconColor = 'success.dark';
-                }
+        {/* Files */}
+        <Card>
+          <CardHeader
+            title={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {t('Files')}
+                <Chip size="small" label={details.files?.count || 0} />
+              </Box>
+            }
+            avatar={<Iconify icon="mdi:file-multiple" width={24} color="warning.main" />}
+          />
+          <CardContent>
+            {details.files?.files && details.files.files.length > 0 ? (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                {details.files.files.map((file) => {
+                  const ext = file.file_name?.split('.').pop()?.toLowerCase() || '';
+                  const isPdf = ext === 'pdf';
+                  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+                  const isDoc = ['doc', 'docx'].includes(ext);
+                  const isExcel = ['xls', 'xlsx'].includes(ext);
 
-                return (
-                  <Box
-                    key={file.id}
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      p: 2,
-                      borderRadius: 1,
-                      border: `1px solid ${theme.palette.divider}`,
-                      bgcolor: 'background.neutral',
-                      minWidth: 100,
-                      maxWidth: 120,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        bgcolor: theme.palette.action.hover,
-                        boxShadow: theme.shadows[2],
-                      },
-                    }}
-                    onClick={() => {
-                      if (file.path) {
-                        window.open(`${import.meta.env.VITE_SERVER_URL}${file.path}`, '_blank');
-                      }
-                    }}
-                    title={file.description || file.file_name}
-                  >
-                    <Iconify icon={fileIcon} width={40} sx={{ color: iconColor, mb: 1 }} />
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
+                  let fileIcon = 'mdi:file-outline';
+                  let iconColor = 'text.secondary';
+
+                  if (isPdf) {
+                    fileIcon = 'mdi:file-pdf-box';
+                    iconColor = 'error.main';
+                  } else if (isImage) {
+                    fileIcon = 'mdi:file-image';
+                    iconColor = 'success.main';
+                  } else if (isDoc) {
+                    fileIcon = 'mdi:file-word';
+                    iconColor = 'info.main';
+                  } else if (isExcel) {
+                    fileIcon = 'mdi:file-excel';
+                    iconColor = 'success.dark';
+                  }
+
+                  return (
+                    <Box
+                      key={file.id}
                       sx={{
-                        textAlign: 'center',
-                        wordBreak: 'break-all',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        p: 2,
+                        borderRadius: 1,
+                        border: `1px solid ${theme.palette.divider}`,
+                        bgcolor: 'background.neutral',
+                        minWidth: 100,
+                        maxWidth: 120,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          bgcolor: theme.palette.action.hover,
+                          boxShadow: theme.shadows[2],
+                        },
                       }}
+                      onClick={() => {
+                        if (file.path) {
+                          window.open(`${import.meta.env.VITE_SERVER_URL}${file.path}`, '_blank');
+                        }
+                      }}
+                      title={file.description || file.file_name}
                     >
-                      {file.description || ext.toUpperCase()}
-                    </Typography>
-                    <Typography variant="caption" color="text.disabled" sx={{ mt: 0.5 }}>
-                      {dayjs(file.created_at).format('DD.MM.YY')}
-                    </Typography>
-                  </Box>
-                );
-              })}
-            </Box>
-          ) : (
-            <Typography color="text.secondary" textAlign="center" py={2}>
-              {t('No data available')}
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
-
-      </Box>{/* end pdfRef */}
+                      <Iconify icon={fileIcon} width={40} sx={{ color: iconColor, mb: 1 }} />
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{
+                          textAlign: 'center',
+                          wordBreak: 'break-all',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {file.description || ext.toUpperCase()}
+                      </Typography>
+                      <Typography variant="caption" color="text.disabled" sx={{ mt: 0.5 }}>
+                        {dayjs(file.created_at).format('DD.MM.YY')}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+            ) : (
+              <Typography color="text.secondary" textAlign="center" py={2}>
+                {t('No data available')}
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
+      {/* end pdfRef */}
     </Box>
   );
 }
