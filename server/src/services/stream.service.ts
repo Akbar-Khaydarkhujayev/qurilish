@@ -456,24 +456,23 @@ function buildRtspUrl(login: string, password: string, ip: string): string {
 }
 
 /**
- * Get or create a CameraStream for a given building ID.
- * Looks up camera credentials from the database.
+ * Get or create a CameraStream for a given camera ID.
+ * Looks up camera credentials from the cameras table.
  */
 async function getOrCreateCameraStream(
-  buildingId: string,
+  cameraId: string,
 ): Promise<CameraStream | null> {
   // Return existing stream if still valid
-  const existing = cameraStreams.get(buildingId);
+  const existing = cameraStreams.get(cameraId);
   if (existing) return existing;
 
-  // Look up camera info from the database
+  // Look up camera info from the cameras table
   try {
     const result = await pool.query(
       `SELECT camera_login, camera_password, camera_ip
-       FROM object_card
-       WHERE id = $1 AND is_deleted = FALSE
-         AND camera_ip IS NOT NULL AND camera_ip != ''`,
-      [buildingId],
+       FROM cameras
+       WHERE id = $1 AND is_deleted = FALSE`,
+      [cameraId],
     );
 
     if (result.rows.length === 0) return null;
@@ -487,12 +486,12 @@ async function getOrCreateCameraStream(
       wsPath: "/api/stream",
     };
 
-    const stream = new CameraStream(buildingId, config);
-    cameraStreams.set(buildingId, stream);
+    const stream = new CameraStream(cameraId, config);
+    cameraStreams.set(cameraId, stream);
     return stream;
   } catch (err: any) {
     console.error(
-      `[Stream] Failed to look up camera for building ${buildingId}:`,
+      `[Stream] Failed to look up camera ${cameraId}:`,
       err.message,
     );
     return null;
@@ -518,7 +517,7 @@ export function setupStreamWebSocket(server: HttpServer | HttpsServer) {
       getOrCreateCameraStream(src)
         .then((camera) => {
           if (!camera) {
-            console.warn(`[Stream] No camera configured for building: ${src}`);
+            console.warn(`[Stream] No camera found for camera ID: ${src}`);
             socket.destroy();
             return;
           }
@@ -538,7 +537,7 @@ export function setupStreamWebSocket(server: HttpServer | HttpsServer) {
   });
 
   console.log("📹 Stream WebSocket server initialized");
-  console.log("   Connect: ws://<host>:<port>/api/stream?src=<buildingId>");
+  console.log("   Connect: ws://<host>:<port>/api/stream?src=<cameraId>");
 
   return wss;
 }

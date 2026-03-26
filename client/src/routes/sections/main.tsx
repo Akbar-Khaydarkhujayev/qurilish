@@ -38,6 +38,10 @@ const BuildingEstimatesPage = lazy(() => import('src/pages/dashboard/buildings/e
 const BuildingExpensesPage = lazy(() => import('src/pages/dashboard/buildings/bank-expenses'));
 const BuildingInvoicesPage = lazy(() => import('src/pages/dashboard/buildings/invoices'));
 const BuildingFilesPage = lazy(() => import('src/pages/dashboard/buildings/files'));
+const BuildingStateCommissionPage = lazy(
+  () => import('src/pages/dashboard/buildings/state-commission')
+);
+const BuildingCamerasPage = lazy(() => import('src/pages/dashboard/buildings/cameras'));
 
 // ----------------------------------------------------------------------
 
@@ -78,6 +82,8 @@ export const mainRoutes = [
           { path: 'bank-expenses', element: <BuildingExpensesPage /> },
           { path: 'invoices', element: <BuildingInvoicesPage /> },
           { path: 'files', element: <BuildingFilesPage /> },
+          { path: 'state-commission', element: <BuildingStateCommissionPage /> },
+          { path: 'cameras', element: <BuildingCamerasPage /> },
         ],
       },
       {

@@ -7,6 +7,8 @@ import objectCardRoutes from './object-card.routes';
 import objectRelatedRoutes from './object-related.routes';
 import financialRoutes from './financial.routes';
 import fileRoutes from './file.routes';
+import stateCommissionRoutes from './state-commission.routes';
+import camerasRoutes from './cameras.routes';
 import dashboardRoutes from './dashboard.routes';
 
 const router = Router();
@@ -34,6 +36,12 @@ router.use('/', financialRoutes);
 
 // File routes
 router.use('/', fileRoutes);
+
+// State commission routes
+router.use('/', stateCommissionRoutes);
+
+// Cameras routes
+router.use('/', camerasRoutes);
 
 // Dashboard routes
 router.use('/dashboard', dashboardRoutes);

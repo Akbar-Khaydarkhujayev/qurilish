@@ -16,6 +16,8 @@ const TABS = [
   { value: 'bank-expenses', label: 'Bank Expenses', icon: 'solar:wallet-bold' },
   { value: 'invoices', label: 'Invoices', icon: 'solar:bill-list-bold' },
   { value: 'files', label: 'Files', icon: 'solar:folder-bold' },
+  { value: 'state-commission', label: 'Гос. комиссия хулосаси', icon: 'solar:diploma-bold' },
+  { value: 'cameras', label: 'Cameras', icon: 'solar:camera-bold' },
 ];
 
 export default function BuildingDetailLayout() {

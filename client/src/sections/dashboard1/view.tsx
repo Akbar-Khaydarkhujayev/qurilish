@@ -261,20 +261,6 @@ export function Dashboard1View() {
             }}
           />
           <Tab
-            value="completed"
-            label={t('Completed')}
-            sx={{
-              fontSize: 18,
-              fontWeight: 600,
-              borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-              '&.Mui-selected': {
-                color: 'success.main',
-                bgcolor: 'success.lighter',
-                borderRadius: 2,
-              },
-            }}
-          />
-          <Tab
             value="deadline_close"
             label={t('Deadline Close')}
             sx={{
@@ -284,6 +270,20 @@ export function Dashboard1View() {
               '&.Mui-selected': {
                 color: 'warning.main',
                 bgcolor: 'warning.lighter',
+                borderRadius: 2,
+              },
+            }}
+          />
+          <Tab
+            value="completed"
+            label={t('Completed')}
+            sx={{
+              fontSize: 18,
+              fontWeight: 600,
+              borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+              '&.Mui-selected': {
+                color: 'success.main',
+                bgcolor: 'success.lighter',
                 borderRadius: 2,
               },
             }}

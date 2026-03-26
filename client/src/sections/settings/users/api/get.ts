@@ -14,6 +14,7 @@ export interface IUser {
   name: string;
   username: string;
   phone_number: string | null;
+  jshshir: string | null;
   organization_id: number;
   organization?: IOrganization;
   role: UserRole;

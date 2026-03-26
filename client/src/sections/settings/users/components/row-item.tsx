@@ -56,6 +56,7 @@ export const UserRowItem = ({ row, currentUserRole, remove, edit }: UserRowItemP
       <TableCell>{row.name || '-'}</TableCell>
       <TableCell>{row.username || '-'}</TableCell>
       <TableCell>{row.phone_number || '-'}</TableCell>
+      <TableCell>{row.jshshir || '-'}</TableCell>
       <TableCell>{row.organization?.name || '-'}</TableCell>
       <TableCell>
         <Label color={getRoleColor(row.role)}>{t(row.role)}</Label>

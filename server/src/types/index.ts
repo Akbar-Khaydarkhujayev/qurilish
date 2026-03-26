@@ -34,6 +34,8 @@ export interface User {
   region_id?: number;
   role: UserRole;
   user_type?: string;
+  phone_number?: string;
+  jshshir?: string;
   created_at?: Date;
   updated_at?: Date;
   is_deleted?: boolean;

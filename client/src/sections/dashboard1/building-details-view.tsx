@@ -11,6 +11,7 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Stepper from '@mui/material/Stepper';
+import Tooltip from '@mui/material/Tooltip';
 import Collapse from '@mui/material/Collapse';
 import TableRow from '@mui/material/TableRow';
 import StepLabel from '@mui/material/StepLabel';
@@ -40,9 +41,12 @@ import { Carousel, useCarousel, CarouselArrowBasicButtons } from 'src/components
 
 import carouselImg1 from './assets/image.png';
 import WebCodecsPlayer from './webcodecs-player';
+import { useGetCamerasByBuilding } from '../buildings/cameras/api/get';
 import { useGetSubObjectItems } from '../buildings/sub-objects/items/api/get';
 import { useGetBuildingFullDetails } from '../dashboard/api/get-building-details';
 import { useGetConstructionStatuses } from '../settings/construction-statuses/api/get';
+
+import type { ICamera } from '../buildings/cameras/api/get';
 
 // ----------------------------------------------------------------------
 
@@ -104,7 +108,11 @@ export function BuildingDetailsView() {
   const { data: details, isLoading, error } = useGetBuildingFullDetails(buildingId);
   const { data: constructionStatuses } = useGetConstructionStatuses({ page: 1, limit: 999 });
 
+  const { data: camerasData } = useGetCamerasByBuilding(id);
+  const cameras: ICamera[] = camerasData?.data || [];
+
   const [streamOpen, setStreamOpen] = useState(false);
+  const [selectedCamera, setSelectedCamera] = useState<ICamera | null>(null);
   const [exporting, setExporting] = useState(false);
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -164,15 +172,25 @@ export function BuildingDetailsView() {
     return DEFAULT_CAROUSEL_IMAGES;
   }, [details?.images]);
 
-  // Dynamic stream URL based on building ID (camera config is looked up server-side)
+  // Stream URL is built from the selected camera's ID
   const streamUrl = useMemo(() => {
-    if (!buildingId) return '';
+    if (!selectedCamera) return '';
     const url = new URL(SERVER_URL);
     const wsProtocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-    return `${wsProtocol}//${url.host}/api/stream?src=${buildingId}`;
-  }, [buildingId]);
+    return `${wsProtocol}//${url.host}/api/stream?src=${selectedCamera.id}`;
+  }, [selectedCamera]);
 
-  const hasCameraConfig = !!(details?.building?.camera_login && details?.building?.camera_ip);
+  const hasCameras = cameras.length > 0;
+
+  const openStream = (camera: ICamera) => {
+    setSelectedCamera(camera);
+    setStreamOpen(true);
+  };
+
+  const closeStream = () => {
+    setStreamOpen(false);
+    setSelectedCamera(null);
+  };
 
   // Expandable state for sub-objects
   const [expandedSubObjects, setExpandedSubObjects] = useState<number[]>([]);
@@ -314,24 +332,41 @@ export function BuildingDetailsView() {
               }}
             />
 
-            {/* Stream button - only show if camera is configured */}
-            {hasCameraConfig && (
-              <IconButton
-                onClick={() => setStreamOpen(true)}
+            {/* Camera stream buttons - one per camera */}
+            {hasCameras && (
+              <Box
                 sx={{
                   position: 'absolute',
                   bottom: 12,
                   left: 12,
                   zIndex: 9,
-                  width: 48,
-                  height: 48,
-                  color: 'common.white',
-                  bgcolor: 'rgba(0,0,0,0.48)',
-                  '&:hover': { bgcolor: 'error.main' },
+                  display: 'flex',
+                  gap: 1,
                 }}
               >
-                <Iconify icon="mdi:video-outline" width={28} />
-              </IconButton>
+                {cameras.map((camera, index) => (
+                  <Tooltip key={camera.id} title={camera.name}>
+                    <IconButton
+                      onClick={() => openStream(camera)}
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        color: 'common.white',
+                        bgcolor: 'rgba(0,0,0,0.48)',
+                        '&:hover': { bgcolor: 'error.main' },
+                      }}
+                    >
+                      {cameras.length > 1 ? (
+                        <Typography variant="caption" fontWeight="bold">
+                          {index + 1}
+                        </Typography>
+                      ) : (
+                        <Iconify icon="mdi:video-outline" width={28} />
+                      )}
+                    </IconButton>
+                  </Tooltip>
+                ))}
+              </Box>
             )}
 
             <Carousel carousel={carousel}>
@@ -354,7 +389,7 @@ export function BuildingDetailsView() {
           {/* Stream Dialog */}
           <Dialog
             open={streamOpen}
-            onClose={() => setStreamOpen(false)}
+            onClose={closeStream}
             maxWidth="lg"
             fullWidth
             PaperProps={{ sx: { bgcolor: 'background.paper' } }}
@@ -383,13 +418,36 @@ export function BuildingDetailsView() {
                     },
                   }}
                 />
-                <Typography variant="h6">{t('Jonli efir')}</Typography>
+                <Typography variant="h6">
+                  {t('Jonli efir')}
+                  {selectedCamera && ` — ${selectedCamera.name}`}
+                </Typography>
               </Box>
-              <IconButton onClick={() => setStreamOpen(false)}>
+              <IconButton onClick={closeStream}>
                 <Iconify icon="mdi:close" width={24} />
               </IconButton>
             </Box>
-            <DialogContent>{streamOpen && <WebCodecsPlayer wsUrl={streamUrl} />}</DialogContent>
+
+            {/* Camera switcher tabs — only shown when building has multiple cameras */}
+            {cameras.length > 1 && (
+              <Box sx={{ px: 3, pb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {cameras.map((camera) => (
+                  <Chip
+                    key={camera.id}
+                    label={camera.name}
+                    icon={<Iconify icon="mdi:video-outline" width={16} />}
+                    onClick={() => setSelectedCamera(camera)}
+                    color={selectedCamera?.id === camera.id ? 'error' : 'default'}
+                    variant={selectedCamera?.id === camera.id ? 'filled' : 'outlined'}
+                    sx={{ cursor: 'pointer' }}
+                  />
+                ))}
+              </Box>
+            )}
+
+            <DialogContent sx={{ p: 0 }}>
+              {streamOpen && selectedCamera && <WebCodecsPlayer wsUrl={streamUrl} />}
+            </DialogContent>
           </Dialog>
 
           {/* Compact Info Cards */}
