@@ -30,7 +30,7 @@ services:
       DB_PASSWORD: postgres123
       JWT_SECRET: your_jwt_secret_key_here_change_in_production
       JWT_EXPIRES_IN: 7d
-      CLIENT_URL: https://192.168.43.25
+      CLIENT_URL: https://192.168.43.25:8081
     depends_on:
       - db
     volumes:
