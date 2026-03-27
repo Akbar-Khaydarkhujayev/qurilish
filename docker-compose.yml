@@ -42,7 +42,7 @@ services:
       dockerfile: Dockerfile
       args:
         # Replace SERVER_IP with your actual server IP address
-        VITE_SERVER_URL: https://192.168.43.25
+        VITE_SERVER_URL: https://192.168.43.25:8081
     container_name: qurilish_client
     restart: unless-stopped
     ports:
