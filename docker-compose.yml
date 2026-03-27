@@ -9,8 +9,6 @@ services:
       POSTGRES_DB: qurilish_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -20,12 +18,11 @@ services:
       dockerfile: Dockerfile
     container_name: qurilish_server
     restart: unless-stopped
-    ports:
-      - "5000:5000"
+    # Not exposed to the outside — Nginx proxies to it internally
     environment:
       PORT: 5000
-      NODE_ENV: development
-      HTTPS_ENABLED: "true"
+      NODE_ENV: production
+      HTTPS_ENABLED: "false"
       DB_HOST: db
       DB_PORT: 5432
       DB_NAME: qurilish_db
@@ -33,29 +30,28 @@ services:
       DB_PASSWORD: postgres123
       JWT_SECRET: your_jwt_secret_key_here_change_in_production
       JWT_EXPIRES_IN: 7d
-      CLIENT_URL: https://192.168.43.25:8081
+      CLIENT_URL: https://192.168.43.25
     depends_on:
       - db
     volumes:
-      - ./server/src:/app/src
       - ./server/uploads:/app/uploads
-      - /app/node_modules
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
+      args:
+        # Replace SERVER_IP with your actual server IP address
+        VITE_SERVER_URL: https://192.168.43.25
     container_name: qurilish_client
     restart: unless-stopped
     ports:
-      - "8081:8081"
-    environment:
-      VITE_SERVER_URL: https://192.168.43.25:5000
-      VITE_ASSET_URL: https://192.168.43.25:5000
+      - "80:80"
+      - "443:443"
     volumes:
-      - ./client/src:/app/src
-      - ./client/public:/app/public
-      - /app/node_modules
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - server
 
 volumes:
   postgres_data:
