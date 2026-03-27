@@ -10,6 +10,7 @@ export interface ICamera {
   camera_login: string;
   created_at: string;
   updated_at: string;
+  status: 'online' | 'offline' | 'unknown';
 }
 
 export const getCamerasByBuilding = (objectCardId: string): Promise<{ data: ICamera[] }> =>

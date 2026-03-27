@@ -11,6 +11,7 @@ import routes from "./routes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import pool from "./config/database";
 import { setupStreamWebSocket } from "./services/stream.service";
+import { startCameraStatusChecker } from "./services/camera-status.service";
 import { ensureSelfSignedCert } from "./utils/generate-cert";
 
 dotenv.config();
@@ -113,6 +114,9 @@ const startServer = async () => {
 
     // Attach RTSP → WebSocket stream proxy (works on both HTTP and HTTPS)
     setupStreamWebSocket(server);
+
+    // Start periodic camera status checker
+    startCameraStatusChecker();
   } catch (error) {
     console.error("❌ Failed to start server:", error);
     process.exit(1);

@@ -2,6 +2,7 @@ import { Response } from 'express';
 import pool from '../config/database';
 import { AuthRequest } from '../types';
 import * as responseFormatter from '../utils/responseFormatter';
+import { getCameraStatus } from '../services/camera-status.service';
 
 export const getByObjectCardId = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -15,7 +16,12 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
       [objectCardId]
     );
 
-    responseFormatter.success(res, result.rows, 'Cameras retrieved successfully');
+    const cameras = result.rows.map((row: any) => ({
+      ...row,
+      status: getCameraStatus(row.id),
+    }));
+
+    responseFormatter.success(res, cameras, 'Cameras retrieved successfully');
   } catch (error) {
     console.error('Get cameras error:', error);
     responseFormatter.error(res, 'Error retrieving cameras');

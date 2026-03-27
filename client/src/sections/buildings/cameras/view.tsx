@@ -25,7 +25,13 @@ import { CameraDialog } from './components/dialog';
 
 import type { ICamera } from './api/get';
 
-const headLabels = ['Camera Name', 'Camera IP', 'Camera Login', ''];
+const statusColor = {
+  online: '#22c55e',
+  offline: '#ef4444',
+  unknown: '#94a3b8',
+};
+
+const headLabels = ['Status', 'Camera Name', 'Camera IP', 'Camera Login', ''];
 
 export default function CamerasView() {
   const { t } = useTranslate();
@@ -92,6 +98,19 @@ export default function CamerasView() {
               <TableBody>
                 {cameras.map((camera) => (
                   <TableRow key={camera.id} hover>
+                    <TableCell>
+                      <Tooltip title={t(camera.status)}>
+                        <Box
+                          sx={{
+                            width: 10,
+                            height: 10,
+                            borderRadius: '50%',
+                            bgcolor: statusColor[camera.status] ?? statusColor.unknown,
+                            display: 'inline-block',
+                          }}
+                        />
+                      </Tooltip>
+                    </TableCell>
                     <TableCell>{camera.name || '-'}</TableCell>
                     <TableCell>{camera.camera_ip || '-'}</TableCell>
                     <TableCell>{camera.camera_login || '-'}</TableCell>
