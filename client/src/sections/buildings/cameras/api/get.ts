@@ -8,6 +8,7 @@ export interface ICamera {
   name: string;
   camera_ip: string;
   camera_login: string;
+  camera_type: 'dahua' | 'hikvision';
   created_at: string;
   updated_at: string;
   status: 'online' | 'offline' | 'unknown';

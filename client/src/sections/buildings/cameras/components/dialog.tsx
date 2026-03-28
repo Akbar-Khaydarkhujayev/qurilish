@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, Dialog, Button, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Dialog, Button, MenuItem, DialogTitle, DialogContent } from '@mui/material';
 
 import { useTranslate } from 'src/locales';
 
@@ -32,7 +32,7 @@ export const CameraDialog = ({ open, onClose, objectCardId, editedCamera }: IPro
 
   const methods = useForm<FormFields>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: '', camera_ip: '', camera_login: '', camera_password: '' },
+    defaultValues: { name: '', camera_ip: '', camera_login: '', camera_password: '', camera_type: 'dahua' },
   });
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export const CameraDialog = ({ open, onClose, objectCardId, editedCamera }: IPro
       camera_ip: editedCamera?.camera_ip || '',
       camera_login: editedCamera?.camera_login || '',
       camera_password: '',
+      camera_type: editedCamera?.camera_type || 'dahua',
     });
   }, [open, editedCamera, methods]);
 
@@ -66,6 +67,10 @@ export const CameraDialog = ({ open, onClose, objectCardId, editedCamera }: IPro
         <Form methods={methods} onSubmit={onSubmit}>
           <Box pt={1} display="flex" flexDirection="column" gap={2}>
             <Field.Text required size="small" name="name" label={t('Camera Name')} />
+            <Field.Select required size="small" name="camera_type" label={t('Camera Type')}>
+              <MenuItem value="dahua">Dahua</MenuItem>
+              <MenuItem value="hikvision">Hikvision</MenuItem>
+            </Field.Select>
             <Field.Text required size="small" name="camera_ip" label={t('Camera IP')} />
             <Field.Text required size="small" name="camera_login" label={t('Camera Login')} />
             <Field.Text

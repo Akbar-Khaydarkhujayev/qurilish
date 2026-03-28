@@ -31,7 +31,7 @@ const statusColor = {
   unknown: '#94a3b8',
 };
 
-const headLabels = ['Status', 'Camera Name', 'Camera IP', 'Camera Login', ''];
+const headLabels = ['Status', 'Camera Name', 'Camera IP', 'Camera Login', 'Camera Type', ''];
 
 export default function CamerasView() {
   const { t } = useTranslate();
@@ -114,6 +114,7 @@ export default function CamerasView() {
                     <TableCell>{camera.name || '-'}</TableCell>
                     <TableCell>{camera.camera_ip || '-'}</TableCell>
                     <TableCell>{camera.camera_login || '-'}</TableCell>
+                    <TableCell sx={{ textTransform: 'capitalize' }}>{camera.camera_type || 'dahua'}</TableCell>
                     <TableCell align="right">
                       <Box display="flex" justifyContent="end">
                         <Tooltip title={t('Edit')}>

@@ -345,15 +345,22 @@ export function BuildingDetailsView() {
                 }}
               >
                 {cameras.map((camera, index) => (
-                  <Tooltip key={camera.id} title={camera.name}>
+                  <Tooltip
+                    key={camera.id}
+                    title={`${camera.name} — ${camera.status === 'online' ? t('online') : camera.status === 'offline' ? t('offline') : t('unknown')}`}
+                  >
                     <IconButton
                       onClick={() => openStream(camera)}
                       sx={{
                         width: 48,
                         height: 48,
                         color: 'common.white',
-                        bgcolor: 'rgba(0,0,0,0.48)',
+                        bgcolor:
+                          camera.status === 'offline'
+                            ? 'rgba(239,68,68,0.75)'
+                            : 'rgba(0,0,0,0.48)',
                         '&:hover': { bgcolor: 'error.main' },
+                        border: camera.status === 'online' ? '2px solid #22c55e' : 'none',
                       }}
                     >
                       {cameras.length > 1 ? (

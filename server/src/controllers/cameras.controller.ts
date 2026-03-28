@@ -9,7 +9,7 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
     const { objectCardId } = req.params;
 
     const result = await pool.query(
-      `SELECT id, object_card_id, name, camera_ip, camera_login, created_at, updated_at
+      `SELECT id, object_card_id, name, camera_ip, camera_login, camera_type, created_at, updated_at
        FROM cameras
        WHERE object_card_id = $1 AND is_deleted = FALSE
        ORDER BY id ASC`,
@@ -31,7 +31,7 @@ export const getByObjectCardId = async (req: AuthRequest, res: Response): Promis
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { objectCardId } = req.params;
-    const { name, camera_ip, camera_login, camera_password } = req.body;
+    const { name, camera_ip, camera_login, camera_password, camera_type } = req.body;
 
     if (!camera_ip || !camera_login || !camera_password) {
       responseFormatter.badRequest(res, 'camera_ip, camera_login and camera_password are required');
@@ -47,11 +47,13 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
+    const type = camera_type === 'hikvision' ? 'hikvision' : 'dahua';
+
     const result = await pool.query(
-      `INSERT INTO cameras (object_card_id, name, camera_ip, camera_login, camera_password)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, object_card_id, name, camera_ip, camera_login, created_at`,
-      [objectCardId, name || 'Camera', camera_ip, camera_login, camera_password]
+      `INSERT INTO cameras (object_card_id, name, camera_ip, camera_login, camera_password, camera_type)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, object_card_id, name, camera_ip, camera_login, camera_type, created_at`,
+      [objectCardId, name || 'Camera', camera_ip, camera_login, camera_password, type]
     );
 
     responseFormatter.created(res, result.rows[0], 'Camera created successfully');
@@ -64,23 +66,26 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { name, camera_ip, camera_login, camera_password } = req.body;
+    const { name, camera_ip, camera_login, camera_password, camera_type } = req.body;
 
     if (!camera_ip || !camera_login) {
       responseFormatter.badRequest(res, 'camera_ip and camera_login are required');
       return;
     }
 
+    const type = camera_type === 'hikvision' ? 'hikvision' : 'dahua';
+
     const updates: string[] = [
       'name = $1',
       'camera_ip = $2',
       'camera_login = $3',
+      'camera_type = $4',
       'updated_at = CURRENT_TIMESTAMP',
     ];
-    const params: any[] = [name || 'Camera', camera_ip, camera_login];
+    const params: any[] = [name || 'Camera', camera_ip, camera_login, type];
 
     if (camera_password) {
-      updates.splice(3, 0, `camera_password = $${params.length + 1}`);
+      updates.splice(4, 0, `camera_password = $${params.length + 1}`);
       params.push(camera_password);
     }
 
@@ -88,7 +93,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
     const result = await pool.query(
       `UPDATE cameras SET ${updates.join(', ')}
        WHERE id = $${params.length} AND is_deleted = FALSE
-       RETURNING id, object_card_id, name, camera_ip, camera_login, created_at, updated_at`,
+       RETURNING id, object_card_id, name, camera_ip, camera_login, camera_type, created_at, updated_at`,
       params
     );
 

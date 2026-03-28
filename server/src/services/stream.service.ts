@@ -448,10 +448,14 @@ class CameraStream {
 const cameraStreams = new Map<string, CameraStream>();
 
 /**
- * Build an RTSP URL from database camera fields.
- * Format: rtsp://<login>:<password>@<ip>:554/cam/realmonitor?channel=1&subtype=0
+ * Build an RTSP URL from database camera fields based on camera type.
+ * Dahua:    rtsp://login:password@ip:554/cam/realmonitor?channel=1&subtype=0
+ * Hikvision: rtsp://login:password@ip:554/Streaming/Channels/101
  */
-function buildRtspUrl(login: string, password: string, ip: string): string {
+function buildRtspUrl(login: string, password: string, ip: string, cameraType: string): string {
+  if (cameraType === 'hikvision') {
+    return `rtsp://${login}:${password}@${ip}:554/Streaming/Channels/101`;
+  }
   return `rtsp://${login}:${password}@${ip}:554/cam/realmonitor?channel=1&subtype=0`;
 }
 
@@ -469,7 +473,7 @@ async function getOrCreateCameraStream(
   // Look up camera info from the cameras table
   try {
     const result = await pool.query(
-      `SELECT camera_login, camera_password, camera_ip
+      `SELECT camera_login, camera_password, camera_ip, camera_type
        FROM cameras
        WHERE id = $1 AND is_deleted = FALSE`,
       [cameraId],
@@ -477,10 +481,10 @@ async function getOrCreateCameraStream(
 
     if (result.rows.length === 0) return null;
 
-    const { camera_login, camera_password, camera_ip } = result.rows[0];
+    const { camera_login, camera_password, camera_ip, camera_type } = result.rows[0];
     if (!camera_login || !camera_password || !camera_ip) return null;
 
-    const rtspUrl = buildRtspUrl(camera_login, camera_password, camera_ip);
+    const rtspUrl = buildRtspUrl(camera_login, camera_password, camera_ip, camera_type || 'dahua');
     const config: StreamConfig = {
       rtspUrl,
       wsPath: "/api/stream",
