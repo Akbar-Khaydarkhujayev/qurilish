@@ -311,7 +311,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
             >
               <MenuItem value="">{t('Tanlanmagan')}</MenuItem>
               {usersData?.data
-                .filter((u) => u.role === 'user')
+                .filter((u) => u.role === 'user' || u.id === user?.id)
                 .map((techUser) => (
                   <MenuItem key={techUser.id} value={techUser.id}>
                     {techUser.name} ({techUser.username})
