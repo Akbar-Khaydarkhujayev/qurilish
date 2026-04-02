@@ -79,6 +79,7 @@
   "delete": "O'chirish",
   "Delete": "O'chirish",
   "deleteConfirm": "O'chirishni tasdiqlaysizmi?",
+  "Cannot delete construction status that is in use": "Foydalanilayotgan qurilish holatini o'chirib bo'lmaydi",
   "deleteSuccess": "Muvaffaqiyatli o'chirildi",
   "Description": "Tavsif",
   "Details": "Tafsilotlar",

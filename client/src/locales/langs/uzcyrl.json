@@ -79,6 +79,7 @@
   "delete": "Ўчириш",
   "Delete": "Ўчириш",
   "deleteConfirm": "Ўчиришни тасдиқлайсизми?",
+  "Cannot delete construction status that is in use": "Фойдаланилаётган қурилиш ҳолатини ўчириб бўлмайди",
   "deleteSuccess": "Муваффақиятли ўчирилди",
   "Description": "Тавсиф",
   "Details": "Тафсилотлар",

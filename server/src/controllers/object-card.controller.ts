@@ -49,8 +49,12 @@ export const getAll = async (
 
     // Role-based filtering:
     // super_admin: can see all buildings
-    // region_admin and user: can see only buildings with same organization_id
-    if (currentUser.role !== "super_admin") {
+    // region_admin: can see buildings within their organization
+    // user: can see only buildings they are assigned to as technical_supervisor
+    if (currentUser.role === "user") {
+      whereClause += ` AND object_card.technical_supervisor_id = $${params.length + 1}`;
+      params.push(currentUser.id);
+    } else if (currentUser.role !== "super_admin") {
       whereClause += ` AND object_card.organization_id = $${params.length + 1}`;
       params.push(currentUser.organization_id);
     }
@@ -406,16 +410,17 @@ export const create = async (
       return;
     }
 
-    // Validate technical supervisor if provided
-    if (technical_supervisor_id) {
-      const supervisorCheck = await pool.query(
-        "SELECT id FROM users WHERE id = $1 AND is_deleted = FALSE",
-        [technical_supervisor_id],
-      );
-      if (supervisorCheck.rows.length === 0) {
-        responseFormatter.badRequest(res, "Invalid technical supervisor ID");
-        return;
-      }
+    // Use current user as technical supervisor if not specified
+    const resolvedSupervisorId = technical_supervisor_id || req.user!.id;
+
+    // Validate technical supervisor
+    const supervisorCheck = await pool.query(
+      "SELECT id FROM users WHERE id = $1 AND is_deleted = FALSE",
+      [resolvedSupervisorId],
+    );
+    if (supervisorCheck.rows.length === 0) {
+      responseFormatter.badRequest(res, "Invalid technical supervisor ID");
+      return;
     }
 
     // Validate organization exists
@@ -461,7 +466,7 @@ export const create = async (
         project_organization_id,
         object_passport || null,
         contractor_id,
-        technical_supervisor_id || null,
+        resolvedSupervisorId,
         construction_start_date || null,
         construction_end_date || null,
         construction_status_id,

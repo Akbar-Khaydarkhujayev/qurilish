@@ -122,7 +122,7 @@ export const BuildingDialog = ({ open, onClose, editedBuildingId }: IProps) => {
         project_organization_id: undefined as unknown as number,
         // object_passport: '',
         contractor_id: undefined as unknown as number,
-        technical_supervisor_id: null,
+        technical_supervisor_id: user?.id || null,
         construction_start_date: null,
         construction_end_date: null,
         construction_status_id: undefined as unknown as number,

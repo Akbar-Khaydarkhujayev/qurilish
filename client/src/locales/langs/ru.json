@@ -79,6 +79,7 @@
   "delete": "Удалить",
   "Delete": "Удалить",
   "deleteConfirm": "Вы уверены, что хотите удалить?",
+  "Cannot delete construction status that is in use": "Невозможно удалить статус строительства, который используется",
   "deleteSuccess": "Удалено успешно",
   "Description": "Описание",
   "Details": "Детали",
