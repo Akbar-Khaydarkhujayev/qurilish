@@ -20,13 +20,8 @@ export const useDeleteConstructionStatus = () => {
       });
       toast.success(t('deleteSuccess'));
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message;
-      if (message === 'Cannot delete construction status that is in use') {
-        toast.error(t('Cannot delete construction status that is in use'));
-      } else {
-        toast.error(t('deleteError'));
-      }
+    onError: () => {
+      toast.error(t('Cannot delete construction status that is in use'));
     },
   });
 };
